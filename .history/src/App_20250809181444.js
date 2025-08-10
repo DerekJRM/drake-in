@@ -51,7 +51,7 @@ function App() {
           roundedCircle
           alt="Imagen redondeada"
           fluid
-          style={{ maxWidth: '300px', maxHeight: '300px' }}
+          style={{ maxWidth: '150px', maxHeight: '150px' }}
         />
         {/* 
         <p>Lista de Usuarios:</p>
