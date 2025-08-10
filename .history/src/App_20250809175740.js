@@ -6,12 +6,8 @@ import apiRest from './components/service';
 
 function App() {
   const queryClient = useQueryClient();
-  
-  /*
-  //Ejemplo de uso de React Query para manejar la API
-
   const [nuevoNombre, setNuevoNombre] = useState("");
-
+  
   // Consulta para obtener usuarios
   const { data: usuarios = [], isLoading, error } = useQuery({
     queryKey: ["usuarios"],
@@ -20,32 +16,31 @@ function App() {
       return res;
     },
   });
+  console.log("usuarios:", usuarios);
 
   // Mutación para crear usuario
-  const createMutation = useMutation(
-    (usuario) => apiRest.createUsuario(usuario),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["usuarios"]);
-        setNuevoNombre("");
-      }
-    }
-  );
+  // const createMutation = useMutation(
+  //   (usuario) => apiRest.createUsuario(usuario),
+  //   {
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries(["usuarios"]);
+  //       setNuevoNombre("");
+  //     }
+  //   }
+  // );
 
-  const handleCrearUsuario = () => {
-    if (!nuevoNombre.trim()) return;
-    createMutation.mutate({ nombre: nuevoNombre });
-  };
+  // const handleCrearUsuario = () => {
+  //   if (!nuevoNombre.trim()) return;
+  //   createMutation.mutate({ nombre: nuevoNombre });
+  // };
 
   if (isLoading) return <p>Cargando usuarios...</p>;
   if (error) return <p>Error al cargar usuarios</p>;
-  */
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        {/* 
         <p>Lista de Usuarios:</p>
         <ul>
           {usuarios.map(user => (
@@ -59,10 +54,9 @@ function App() {
           value={nuevoNombre}
           onChange={e => setNuevoNombre(e.target.value)}
         />
-        <button onClick={handleCrearUsuario} disabled={createMutation.isLoading}>
+        {/* <button onClick={handleCrearUsuario} disabled={createMutation.isLoading}>
           {createMutation.isLoading ? "Creando..." : "Crear Usuario"}
-        </button>
-        */}
+        </button> */}
       </header>
     </div>
   );

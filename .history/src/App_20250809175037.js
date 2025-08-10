@@ -6,20 +6,13 @@ import apiRest from './components/service';
 
 function App() {
   const queryClient = useQueryClient();
-  
-  /*
-  //Ejemplo de uso de React Query para manejar la API
-
   const [nuevoNombre, setNuevoNombre] = useState("");
-
+  
   // Consulta para obtener usuarios
-  const { data: usuarios = [], isLoading, error } = useQuery({
-    queryKey: ["usuarios"],
-    queryFn: async () => {
-      const res = await apiRest.getUsuarios();
-      return res;
-    },
-  });
+  const { data: usuarios, isLoading, error } = useQuery(
+    ["usuarios"],
+    () => apiRest.getUsuarios()
+  );
 
   // Mutación para crear usuario
   const createMutation = useMutation(
@@ -39,13 +32,11 @@ function App() {
 
   if (isLoading) return <p>Cargando usuarios...</p>;
   if (error) return <p>Error al cargar usuarios</p>;
-  */
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        {/* 
         <p>Lista de Usuarios:</p>
         <ul>
           {usuarios.map(user => (
@@ -62,7 +53,6 @@ function App() {
         <button onClick={handleCrearUsuario} disabled={createMutation.isLoading}>
           {createMutation.isLoading ? "Creando..." : "Crear Usuario"}
         </button>
-        */}
       </header>
     </div>
   );

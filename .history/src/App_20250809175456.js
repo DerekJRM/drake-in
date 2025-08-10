@@ -6,12 +6,8 @@ import apiRest from './components/service';
 
 function App() {
   const queryClient = useQueryClient();
-  
-  /*
-  //Ejemplo de uso de React Query para manejar la API
-
   const [nuevoNombre, setNuevoNombre] = useState("");
-
+  
   // Consulta para obtener usuarios
   const { data: usuarios = [], isLoading, error } = useQuery({
     queryKey: ["usuarios"],
@@ -39,13 +35,11 @@ function App() {
 
   if (isLoading) return <p>Cargando usuarios...</p>;
   if (error) return <p>Error al cargar usuarios</p>;
-  */
 
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        {/* 
         <p>Lista de Usuarios:</p>
         <ul>
           {usuarios.map(user => (
@@ -62,7 +56,6 @@ function App() {
         <button onClick={handleCrearUsuario} disabled={createMutation.isLoading}>
           {createMutation.isLoading ? "Creando..." : "Crear Usuario"}
         </button>
-        */}
       </header>
     </div>
   );
