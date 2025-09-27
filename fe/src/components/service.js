@@ -8,27 +8,147 @@ const api = axios.create({
 });
 
 const apiRest = {
-    // Aqui van las funciones para interactuar con la API, por ejemplo:
-    // getUsuario: async (id) => {
-    //     const res = await api.get(`/usuarios/${id}`);
-    //     return res.data;
-    // },
-    // getUsuarios: async () => {
-    //     const res = await api.get('/usuarios');
-    //     return res.data;
-    // },
-    // createUsuario: async (usuario) => {
-    //     const res = await api.post('/usuarios', usuario);
-    //     return res.data;
-    // },
-    // updateUsuario: async (id, usuario) => {
-    //     const res = await api.put(`/usuarios/${id}`, usuario);
-    //     return res.data;
-    // },
-    // deleteUsuario: async (id) => {
-    //     const res = await api.delete(`/usuarios/${id}`);
-    //     return res.data;
-    // },
+
+    // ================================= HORARIOS =================================
+
+    // Listar todos los horarios
+    getHorarios: async () => {
+        const res = await api.get("/findAllHorarios");
+        return res.data;
+    },
+
+    // Obtener un horario por id
+    getHorarioById: async (id) => {
+        const res = await api.get("/findHorarioById", { params: { id } });
+        return res.data;
+    },
+
+    // Crear o actualizar un horario (tu método save unifica ambos)
+    saveHorario: async (horario) => {
+        const res = await api.post("/saveHorario", horario);
+        return res.data;
+    },
+
+    // Eliminar un horario por id
+    deleteHorario: async (id) => {
+        const res = await api.delete("/deleteHorarioById", { params: { id } });
+        return res.data;
+    },
+
+    // ================================= OPERADORES =================================
+
+    getOperadores: async () => {
+        const res = await api.get("/findAllOperadores");
+        return res.data;
+    },
+
+    getOperadorById: async (id) => {
+        const res = await api.get("/findOperadorById", { params: { id } });
+        return res.data;
+    },
+
+    saveOperador: async (operador) => {
+        const res = await api.post("/saveOperador", operador);
+        return res.data;
+    },
+
+    deleteOperador: async (id) => {
+        const res = await api.delete("/deleteOperadorById", { params: { id } });
+        return res.data;
+    },
+
+    // ================================= PASAJEROS =================================
+
+    getPasajeros: async () => {
+        const res = await api.get("/findAllPasajeros");
+        return res.data;
+    },
+
+   getPasajerosByRuta: async (rutaId) => {
+        const res = await api.get("/findPasajerosByRutaId", { params: { rutaId } });
+        return res.data;
+    },
+
+    getPasajeroById: async (id) => {
+        const res = await api.get("/findPasajeroById", { params: { id } });
+        return res.data;
+    },
+    
+    savePasajero: async (pasajero) => {
+        const res = await api.post("/savePasajero", pasajero);
+        return res.data;
+    },
+
+    deletePasajero: async (id) => {
+        const res = await api.delete("/deletePasajeroById", { params: { id } });
+        return res.data;
+    },
+    
+    // ================================= PUERTOS =================================
+
+    getPuertos: async () => {
+        const res = await api.get("/findAllPuertos");
+        return res.data;
+    },
+
+    getPuertoById: async (id) => {
+        const res = await api.get("/findPuertoById", { params: { id } });
+        return res.data;
+    },
+
+    savePuerto: async (puerto) => {
+        const res = await api.post("/savePuerto", puerto);
+        return res.data;
+    },
+
+    deletePuerto: async (id) => {
+        const res = await api.delete("/deletePuertoById", { params: { id } });
+        return res.data;
+    },
+
+    // ================================= RUTAS =================================
+
+    getRutas: async () => {
+        const res = await api.get("/findAllRutas");
+        return res.data;
+    },
+
+    getRutaById: async (id) => {
+        const res = await api.get("/findRutaById", { params: { id } });
+        return res.data;
+    },
+
+    saveRuta: async (ruta) => {
+        const res = await api.post("/saveRuta", ruta);
+        return res.data;
+    },
+
+    deleteRuta: async (id) => {
+        const res = await api.delete("/deleteRutaById", { params: { id } });
+        return res.data;
+    },
+
+    // ================================= USUARIO =================================
+
+    getUsuarios: async () => {
+        const res = await api.get("/findAllUsuarios");
+        return res.data;
+    },
+
+    getUsuarioById: async (id) => {
+        const res = await api.get("/findUsuarioById", { params: { id } });
+        return res.data;
+    },
+
+    saveUsuario: async (usuario) => {
+        const res = await api.post("/saveUsuario", usuario);
+        return res.data;
+    },
+
+    deleteUsuario: async (id) => {
+        const res = await api.delete("/deleteUsuarioById", { params: { id } });
+        return res.data;
+    }
 };
 
 export default apiRest;
