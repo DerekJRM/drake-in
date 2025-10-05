@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { TextInput, FieldError, SubmitButton } from "../common";
 import { validateLoginForm } from "../../utils/validators";
-import useFormValidation from "../../hooks/useFormValidation";
+import useFormValidation from "../../hooks/useFormValidation.js";
 
 /**
  * Formulario de inicio de sesión

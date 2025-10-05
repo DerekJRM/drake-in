@@ -7,3 +7,4 @@ export { default as Navbar } from "./Navbar";
 export { default as SelectField } from "./SelectField";
 export { default as SubmitButton } from "./SubmitButton";
 export { default as TextInput } from "./TextInput";
+export { default as TimeInput } from "./TimeInput";

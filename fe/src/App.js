@@ -9,8 +9,9 @@ import Footer from "./components/common/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Reservations from "./pages/Reservations";
-import RoutesPage from "./pages/Routes";
+import ReservationsHotel from "./pages/ReservationsHotel";
+import ReservationsBote from "./pages/ReservationsBote";
+import RoutesPage from "./pages/RoutesAdministration";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -22,7 +23,14 @@ function App() {
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.REGISTER} element={<Register />} />
-          <Route path={ROUTES.RESERVATIONS} element={<Reservations />} />
+          <Route
+            path={ROUTES.RESERVATIONSHOTEL}
+            element={<ReservationsHotel />}
+          />
+          <Route
+            path={ROUTES.RESERVATIONSBOTE}
+            element={<ReservationsBote />}
+          />
           <Route path={ROUTES.ROUTES} element={<RoutesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

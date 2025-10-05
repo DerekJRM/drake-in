@@ -12,7 +12,7 @@ const Navbar = () => {
             <Link to={ROUTES.HOME}>Inicio</Link>
           </li>
           <li>
-            <Link to={ROUTES.RESERVATIONS}>Ver Reservaciones</Link>
+            <Link to={ROUTES.RESERVATIONSHOTEL}>Ver Reservaciones</Link>
           </li>
           <li>
             <Link to={ROUTES.ROUTES}>Administrar Rutas</Link>

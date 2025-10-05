@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { HOTELS } from "../utils/constants";
 import { useHorarios } from "./useHorarios";
 import { usePuertos } from "./usePuertos";
-import useFormValidation from "./useFormValidation";
+import useFormValidation from "./useFormValidation.js";
 import { validateReservationForm } from "../utils/validators";
 
 /**

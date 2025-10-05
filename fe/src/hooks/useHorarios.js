@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import apiRest from "../components/service";
+import apiRest from "../services/api";
 
 // Hook para OBTENER todos los horarios
 export const useHorarios = () => {
