@@ -20,10 +20,6 @@ const DateTimeSection = ({
   errorHorarios,
   canPickSchedule,
 }) => {
-  const schedulePlaceholder = canPickSchedule
-    ? "Selecciona un horario"
-    : "Selecciona origen, destino y fecha primero";
-
   return (
     <fieldset style={{ border: "none", padding: 0 }}>
       <legend className="sr-only">Fecha y horario</legend>
@@ -50,7 +46,7 @@ const DateTimeSection = ({
           onChange={onChange}
           required
           disabled={!canPickSchedule || loadingHorarios}
-          placeholder={schedulePlaceholder}
+          placeholder={"Selecciona un horario"}
           loading={loadingHorarios}
           error={errorHorarios}
           options={horarios}

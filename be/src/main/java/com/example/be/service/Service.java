@@ -220,6 +220,7 @@ public class Service implements I_Service {
     public Ruta saveRuta(Ruta ruta) {
         try {
             if (ruta.isNewItem()) {
+                ruta.setId(null);
                 return this.rutaRepository.saveAndFlush(ruta);
             } else {
                 if (ruta.getUpdateableFields() != null && ruta.getUpdateableFields().isEmpty()) {
