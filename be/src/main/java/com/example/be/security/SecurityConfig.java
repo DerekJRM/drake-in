@@ -36,7 +36,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults()) // activa configuración CORS de abajo
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // --- Rutas públicas ---
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/findAll**", "/api/find**").permitAll()  // GET públicos
+                        // --- Todo lo demás requiere autenticación ---
                         .requestMatchers("/api/**").authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
