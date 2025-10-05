@@ -25,9 +25,6 @@ public class Ruta {
     @Column(name = "ORIGEN_ID", nullable = false)
     private Long origenId;
 
-    @Column(name = "DESTINO_ID", nullable = false)
-    private Long destinoId;
-
     @Column(name = "FECHA", nullable = false)
     private LocalDate fecha;
 

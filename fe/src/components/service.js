@@ -57,30 +57,30 @@ const apiRest = {
         return res.data;
     },
 
-    // ================================= PASAJEROS =================================
+    // ================================= RESERVAS =================================
 
-    getPasajeros: async () => {
-        const res = await api.get("/findAllPasajeros");
+    getReservas: async () => {
+        const res = await api.get("/findAllReservas");
         return res.data;
     },
 
-   getPasajerosByRuta: async (rutaId) => {
-        const res = await api.get("/findPasajerosByRutaId", { params: { rutaId } });
+   getReservasByRuta: async (rutaId) => {
+        const res = await api.get("/findReservasByRutaId", { params: { rutaId } });
         return res.data;
     },
 
-    getPasajeroById: async (id) => {
-        const res = await api.get("/findPasajeroById", { params: { id } });
+    getReservaById: async (id) => {
+        const res = await api.get("/findReservaById", { params: { id } });
         return res.data;
     },
     
-    savePasajero: async (pasajero) => {
-        const res = await api.post("/savePasajero", pasajero);
+    saveReserva: async (pasajero) => {
+        const res = await api.post("/saveReserva", pasajero);
         return res.data;
     },
 
-    deletePasajero: async (id) => {
-        const res = await api.delete("/deletePasajeroById", { params: { id } });
+    deleteReserva: async (id) => {
+        const res = await api.delete("/deleteReservaById", { params: { id } });
         return res.data;
     },
     

@@ -26,17 +26,17 @@ public interface I_Service {
 
     public void deleteOperadorById(Long id);
 
-    // ================================= PASAJEROS =================================
+    // ================================= RESERVAS =================================
 
-    public List<Pasajero> findAllPasajeros();
+    public List<Reserva> findAllReservas();
     
-    public List<Pasajero> findPasajerosByRutaId(Long rutaId);
+    public List<Reserva> findReservasByRutaId(Long rutaId);
 
-    public Pasajero findPasajeroById(Long id);
+    public Reserva findReservaById(Long id);
 
-    public Pasajero savePasajero(Pasajero pasajero);
+    public Reserva saveReserva(Reserva reserva);
 
-    public void deletePasajeroById(Long id);
+    public void deleteReservaById(Long id);
 
     // ================================= PUERTOS =================================
 

@@ -79,36 +79,36 @@ public class Controller {
         }
     }
 
-    // ================================= PASAJEROS =================================
+    // ================================= RESERVAS =================================
 
-    @GetMapping("findAllPasajeros")
-    public ResponseEntity<?> findAllPasajeros() {
-        return ResponseEntity.ok(service.findAllPasajeros());
+    @GetMapping("findAllReservas")
+    public ResponseEntity<?> findAllReservas() {
+        return ResponseEntity.ok(service.findAllReservas());
     }
 
-    @GetMapping("findPasajerosByRutaId")
-    public ResponseEntity<?> findPasajerosByRutaId(@RequestParam Long rutaId) {
-        return ResponseEntity.ok(service.findPasajerosByRutaId(rutaId));
+    @GetMapping("findReservasByRutaId")
+    public ResponseEntity<?> findReservasByRutaId(@RequestParam Long rutaId) {
+        return ResponseEntity.ok(service.findReservasByRutaId(rutaId));
     }
 
-    @GetMapping("findPasajeroById")
-    public ResponseEntity<?> findPasajeroById(@RequestParam Long id) {
-        return ResponseEntity.ok(service.findPasajeroById(id));
+    @GetMapping("findReservaById")
+    public ResponseEntity<?> findReservaById(@RequestParam Long id) {
+        return ResponseEntity.ok(service.findReservaById(id));
     }
 
-    @PostMapping("savePasajero")
-    public ResponseEntity<?> savePasajero(@RequestBody Pasajero pasajero) {
+    @PostMapping("saveReserva")
+    public ResponseEntity<?> saveReserva(@RequestBody Reserva reserva) {
         try {
-            return ResponseEntity.ok(service.savePasajero(pasajero));
+            return ResponseEntity.ok(service.saveReserva(reserva));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("deletePasajeroById")
-    public ResponseEntity<?> deletePasajeroById(@RequestParam Long id) {
+    @DeleteMapping("deleteReservaById")
+    public ResponseEntity<?> deleteReservaById(@RequestParam Long id) {
         try {
-            service.deletePasajeroById(id);
+            service.deleteReservaById(id);
             return ResponseEntity.ok("Registro eliminado correctamente.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

@@ -16,7 +16,7 @@ public class Service implements I_Service {
     private OperadorRepository operadorRepository;
 
     @Autowired
-    private PasajeroRepository pasajeroRepository;
+    private ReservaRepository reservaRepository;
 
     @Autowired
     private PuertoRepository puertoRepository;
@@ -113,39 +113,39 @@ public class Service implements I_Service {
         }
     }
 
-    // ================================= PASAJEROS =================================
+    // ================================= RESERVAS =================================
 
     @Override
-    public List<Pasajero> findAllPasajeros() {
-        return pasajeroRepository.findAll();
+    public List<Reserva> findAllReservas() {
+        return reservaRepository.findAll();
     }
 
     @Override
-    public List<Pasajero> findPasajerosByRutaId(Long rutaId) {
-        return pasajeroRepository.findByRutaId(rutaId);
+    public List<Reserva> findReservasByRutaId(Long rutaId) {
+        return reservaRepository.findByRutaId(rutaId);
     }
 
     @Override
-    public Pasajero findPasajeroById(Long id) {
-        return pasajeroRepository.findById(id).orElse(null);
+    public Reserva findReservaById(Long id) {
+        return reservaRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Pasajero savePasajero(Pasajero pasajero) {
+    public Reserva saveReserva(Reserva reserva) {
         try {
-            if (pasajero.isNewItem()) {
-                return this.pasajeroRepository.saveAndFlush(pasajero);
+            if (reserva.isNewItem()) {
+                return this.reservaRepository.saveAndFlush(reserva);
             } else {
-                if (pasajero.getUpdateableFields() != null && pasajero.getUpdateableFields().isEmpty()) {
+                if (reserva.getUpdateableFields() != null && reserva.getUpdateableFields().isEmpty()) {
                     throw new Exception("No se han realizado cambios en el registro.");
                 }
 
-                Pasajero pasajeroFrontend = this.findPasajeroById(pasajero.getId());
-                pasajeroFrontend.applyUpdateableFields(pasajero);
+                Reserva reservaFrontend = this.findReservaById(reserva.getId());
+                reservaFrontend.applyUpdateableFields(reserva);
 
-                this.pasajeroRepository.saveAndFlush(pasajeroFrontend);
+                this.reservaRepository.saveAndFlush(reservaFrontend);
 
-                return pasajeroFrontend;
+                return reservaFrontend;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -153,9 +153,9 @@ public class Service implements I_Service {
     }
 
     @Override
-    public void deletePasajeroById(Long id) {
+    public void deleteReservaById(Long id) {
         try {
-            pasajeroRepository.deleteById(id);
+            reservaRepository.deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

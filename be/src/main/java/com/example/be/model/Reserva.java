@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "PASAJEROS")
-public class Pasajero {
+@Table(name = "RESERVAS")
+public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,9 @@ public class Pasajero {
 
     @Column(name = "CORREO", length = 100, nullable = false)
     private String correo;
+
+    @Column(name = "DESTINO_ID", nullable = false)
+    private Long destinoId;
 
     @Transient
     private boolean newItem;
@@ -45,7 +48,7 @@ public class Pasajero {
      * y los mapea en el objeto original para que sean actualizables, sin modificar ningun elemento no deseado.
      * @param objActualiza
      */
-    public void applyUpdateableFields (Pasajero objActualiza) throws Exception {
+    public void applyUpdateableFields (Reserva objActualiza) throws Exception {
         if (objActualiza.hasUpdatableFields()) {
             for (String atributo : objActualiza.getUpdateableFields()){
                 try {
