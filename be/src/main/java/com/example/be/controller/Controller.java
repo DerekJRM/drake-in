@@ -5,6 +5,7 @@ import com.example.be.service.I_Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class Controller {
         return ResponseEntity.ok(service.findHorarioById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveHorario")
     public ResponseEntity<?> saveHorario(@RequestBody Horario horario) {
         try {
@@ -36,6 +38,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deleteHorarioById")
     public ResponseEntity<?> deleteHorarioById(@RequestParam Long id) {
         try {
@@ -60,6 +63,7 @@ public class Controller {
         return ResponseEntity.ok(service.findOperadorById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveOperador")
     public ResponseEntity<?> saveOperador(@RequestBody Operador operador) {
         try {
@@ -69,6 +73,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deleteOperadorById")
     public ResponseEntity<?> deleteOperadorById(@RequestParam Long id) {
         try {
@@ -96,6 +101,7 @@ public class Controller {
         return ResponseEntity.ok(service.findReservaById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveReserva")
     public ResponseEntity<?> saveReserva(@RequestBody Reserva reserva) {
         try {
@@ -105,6 +111,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deleteReservaById")
     public ResponseEntity<?> deleteReservaById(@RequestParam Long id) {
         try {
@@ -127,6 +134,7 @@ public class Controller {
         return ResponseEntity.ok(service.findPuertoById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("savePuerto")
     public ResponseEntity<?> savePuerto(@RequestBody Puerto puerto) {
         try {
@@ -136,6 +144,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deletePuertoById")
     public ResponseEntity<?> deletePuertoById(@RequestParam Long id) {
         try {
@@ -158,6 +167,7 @@ public class Controller {
         return ResponseEntity.ok(service.findRutaById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveRuta")
     public ResponseEntity<?> saveRuta(@RequestBody Ruta ruta) {
         try {
@@ -167,6 +177,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deleteRutaById")
     public ResponseEntity<?> deleteRutaById(@RequestParam Long id) {
         try {
@@ -189,6 +200,7 @@ public class Controller {
         return ResponseEntity.ok(service.findUsuarioById(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveUsuario")
     public ResponseEntity<?> saveUsuario(@RequestBody Usuario usuario) {
         try {
@@ -198,6 +210,7 @@ public class Controller {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("deleteUsuarioById")
     public ResponseEntity<?> deleteUsuarioById(@RequestParam Long id) {
         try {
