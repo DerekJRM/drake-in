@@ -94,6 +94,7 @@ const ReservationsHotel = () => {
         />
       </div>
 
+
       <div>
         {viewType === VIEW_TYPES.HOTEL && (
           <HotelView reservations={reservations} hotelName="Drake Bay Resort" />
