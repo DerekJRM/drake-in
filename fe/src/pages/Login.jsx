@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../utils/constants";
+import { PasswordInput } from "../components/common";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -50,17 +51,13 @@ const Login = () => {
               />
             </div>
 
-            <div>
-              <label>Contraseña</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Tu contraseña"
-                required
-              />
-            </div>
+            <PasswordInput
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Tu contraseña"
+              required
+            />
 
             <div>
               <input

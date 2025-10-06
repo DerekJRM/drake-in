@@ -4,6 +4,7 @@ export { default as FieldError } from "./FieldError";
 export { default as Footer } from "./Footer";
 export { default as Loading } from "./Loading";
 export { default as Navbar } from "./Navbar";
+export { default as PasswordInput } from "./PasswordInput";
 export { default as SelectField } from "./SelectField";
 export { default as SubmitButton } from "./SubmitButton";
 export { default as TextInput } from "./TextInput";
