@@ -1,3 +1,24 @@
-.navbar-blue {
-  background-color: #3d9bff !important;
+
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+
+.bg-info {
+    background-color: #6a92b2 !important;
+}
+
+.text-info {
+    color: #6a92b2 !important;
+}
+
+.border-info {
+    border-color: #6a92b2 !important;
+}
+
+.btn-info {
+    background-color: #6a92b2 !important;
+    border-color: #6a92b2 !important;
+}
+
+.btn-info:hover {
+    background-color: #5a8099 !important;
+    border-color: #5a8099 !important;
 }

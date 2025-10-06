@@ -1,9 +1,8 @@
 export const ROUTES = {
   HOME: "/",
-  RESERVATIONSHOTEL: "/reservationsHotel",
-  RESERVATIONSBOTE: "/reservationsBote",
-  ROUTES: "/routes",
-  REGISTER: "/register",
+  RESERVACIONES: "/reservationsBote",
+  RUTAS: "/routes",
+  REGISTRO: "/register",
   LOGIN: "/login",
 };
 

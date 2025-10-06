@@ -9,34 +9,27 @@ import Footer from "./components/common/Footer";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ReservationsHotel from "./pages/ReservationsHotel";
-import ReservationsBote from "./pages/ReservationsBote";
-import RoutesPage from "./pages/RoutesAdministration";
-import NotFound from "./pages/NotFound";
+import Reservaciones from "./pages/Reservaciones";
+import RoutesPage from "./pages/Administracion";
 
 function App() {
   return (
-    <div>
-      <Navbar />
-      <main>
-        <Routes>
-          <Route path={ROUTES.HOME} element={<Home />} />
-          <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.REGISTER} element={<Register />} />
-          <Route
-            path={ROUTES.RESERVATIONSHOTEL}
-            element={<ReservationsHotel />}
-          />
-          <Route
-            path={ROUTES.RESERVATIONSBOTE}
-            element={<ReservationsBote />}
-          />
-          <Route path={ROUTES.ROUTES} element={<RoutesPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+        <div className="container-fluid">
+          <Navbar />
+          <main>
+            <Routes>
+              <Route path={ROUTES.HOME} element={<Home />} />
+              <Route path={ROUTES.LOGIN} element={<Login />} />
+              <Route path={ROUTES.REGISTRO} element={<Register />} />
+              <Route
+                path={ROUTES.RESERVACIONES}
+                element={<Reservaciones />}
+              />
+              <Route path={ROUTES.RUTAS} element={<RoutesPage />} />
+            </Routes>
+          </main>
+          <Footer />
+      </div>
   );
 }
 

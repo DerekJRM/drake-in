@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import RouteModal from "../components/routes/RouteModal";
 import RouteList from "../components/routes/RouteList";
 import { useSaveRuta, useDeleteRuta } from "../hooks/useRutas";

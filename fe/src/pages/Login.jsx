@@ -92,7 +92,7 @@ const Login = () => {
       <div>
         <p>
           ¿No tienes cuenta?
-          <a href={ROUTES.REGISTER}>Regístrate aquí</a>
+          <a href={ROUTES.REGISTRO}>Regístrate aquí</a>
         </p>
       </div>
     </div>
