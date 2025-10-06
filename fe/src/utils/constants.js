@@ -1,6 +1,6 @@
 export const ROUTES = {
   HOME: "/",
-  RESERVACIONES: "/reservationsBote",
+  RESERVACIONES: "/reservationsBoat",
   RUTAS: "/routes",
   REGISTRO: "/register",
   LOGIN: "/login",
