@@ -6,13 +6,13 @@ const Footer = () => {
   const contacts = [
     {
       name: "Derek Rojas",
-      phone: "+506 8710-7411",
-      email: "derekrojas586@gmail.com"
+      phone: "+506 8579-7101",
+      email: "derek.rojas@drakein.com"
     },
     {
-      name: "Carlos Rodríguez",
+      name: "Xiara Suárez",
       phone: "+506 8888-5678",
-      email: "carlos.rodriguez@drakein.com"
+      email: "xiara.suarez@drakein.com"
     },
     {
       name: "Ana Jiménez",

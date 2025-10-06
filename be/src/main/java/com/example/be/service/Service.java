@@ -78,6 +78,11 @@ public class Service implements I_Service {
     }
 
     @Override
+    public List<Operador> findOperadoresByTipo(String tipo) {
+        return operadorRepository.findAllByTipo(tipo);
+    }
+
+    @Override
     public Operador findOperadorById(Long id) {
         return operadorRepository.findById(id).orElse(null);
     }

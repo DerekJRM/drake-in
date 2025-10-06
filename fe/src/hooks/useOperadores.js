@@ -18,6 +18,15 @@ export const useOperadorById = (id) => {
   });
 };
 
+// Hook para OBTENER operadores por tipo (e.g., "BOTE", "HOTEL")
+export const useOperadoresByTipo = (tipo) => {
+  return useQuery({
+    queryKey: ["operadores", tipo],
+    queryFn: () => apiRest.getOperadoresByTipo(tipo),
+    enabled: !!tipo,
+  });
+};
+
 // Hook para CREAR o ACTUALIZAR un operador
 export const useSaveOperador = () => {
   const queryClient = useQueryClient();

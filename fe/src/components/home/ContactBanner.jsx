@@ -10,7 +10,7 @@ const ContactBanner = () => {
   };
 
   return (
-    <Card className="border-0 rounded shadow-sm mb-4" style={{ backgroundColor: '#6a92b2' }}>
+    <Card className="border-0 rounded shadow-sm mb-2" style={{ backgroundColor: '#6a92b2' }}>
       <Card.Body className="p-4 d-flex flex-column align-items-center gap-3 text-center">
         
         <h5 className="mb-0 text-white fw-semibold d-flex align-items-center gap-2">

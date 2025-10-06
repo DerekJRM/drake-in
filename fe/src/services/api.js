@@ -42,6 +42,11 @@ const apiRest = {
         return res.data;
     },
 
+    getOperadoresByTipo: async (tipo) => {
+        const res = await api.get("/findOperadoresByTipo", { params: { tipo } });
+        return res.data;
+    },
+
     getOperadorById: async (id) => {
         const res = await api.get("/findOperadorById", { params: { id } });
         return res.data;

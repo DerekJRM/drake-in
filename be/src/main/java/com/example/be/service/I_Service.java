@@ -20,6 +20,8 @@ public interface I_Service {
 
     public List<Operador> findAllOperadores();
 
+    public List<Operador> findOperadoresByTipo(String tipo);
+
     public Operador findOperadorById(Long id);
 
     public Operador saveOperador(Operador operador);

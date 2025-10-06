@@ -63,6 +63,11 @@ public class Controller {
         return ResponseEntity.ok(service.findOperadorById(id));
     }
 
+    @GetMapping("findOperadoresByTipo")
+    public ResponseEntity<?> findOperadoresByTipo(@RequestParam String tipo) {
+        return ResponseEntity.ok(service.findOperadoresByTipo(tipo));
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveOperador")
     public ResponseEntity<?> saveOperador(@RequestBody Operador operador) {

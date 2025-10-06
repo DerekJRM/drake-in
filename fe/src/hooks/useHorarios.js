@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import apiRest from "../services/api";
 
 // Hook para OBTENER todos los horarios
@@ -15,31 +15,5 @@ export const useHorarioById = (id) => {
     queryKey: ["horario", id],
     queryFn: () => apiRest.getHorarioById(id),
     enabled: !!id, // Solo ejecuta si hay un id
-  });
-};
-
-// Hook para CREAR o ACTUALIZAR un horario
-export const useSaveHorario = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: apiRest.saveHorario,
-    onSuccess: () => {
-      // Invalida el cache para refrescar la lista de horarios
-      queryClient.invalidateQueries({ queryKey: ["horarios"] });
-    },
-  });
-};
-
-// Hook para ELIMINAR un horario
-export const useDeleteHorario = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: apiRest.deleteHorario,
-    onSuccess: () => {
-      // Invalida el cache para refrescar la lista de horarios
-      queryClient.invalidateQueries({ queryKey: ["horarios"] });
-    },
   });
 };

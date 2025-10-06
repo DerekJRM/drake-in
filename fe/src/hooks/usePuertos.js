@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import apiRest from "../services/api";
 
 // Hook para OBTENER todos los puertos
@@ -15,29 +15,5 @@ export const usePuertoById = (id) => {
     queryKey: ["puerto", id],
     queryFn: () => apiRest.getPuertoById(id),
     enabled: !!id,
-  });
-};
-
-// Hook para CREAR o ACTUALIZAR un puerto
-export const useSavePuerto = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: apiRest.savePuerto,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["puertos"] });
-    },
-  });
-};
-
-// Hook para ELIMINAR un puerto
-export const useDeletePuerto = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: apiRest.deletePuerto,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["puertos"] });
-    },
   });
 };

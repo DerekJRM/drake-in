@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
+import { usePuertos } from '../../hooks/usePuertos';
+import { useHorarios } from '../../hooks/useHorarios';
+import { useOperadoresByTipo } from '../../hooks/useOperadores';
 
 function ReservationForm() {
   const [formData, setFormData] = useState({
@@ -13,6 +16,10 @@ function ReservationForm() {
     hotel: ''
   });
 
+  const { data: puertos } = usePuertos();
+  const { data: horarios } = useHorarios();
+  const { data: operadoresHoteles } = useOperadoresByTipo('HOTEL');
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -20,10 +27,26 @@ function ReservationForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Datos del formulario:', formData);
-    // Aquí va la lógica de envío
+    
+      // TODO: Implementar envío al backend
+      // const response = await fetch('/api/reservations', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(formData)
+      // });
+      //
+      // if (!response.ok) throw new Error('Error al crear la reservación');
+      //
+      // const data = await response.json();
+      // console.log('Reservación creada:', data);
+      // // Mostrar mensaje de éxito o redireccionar
+
+      console.log('Datos del formulario:', formData);
+      alert('Reservación creada exitosamente (mock)');
   };
 
   return (
@@ -62,10 +85,11 @@ function ReservationForm() {
                       required
                     >
                       <option value="">Selecciona el origen</option>
-                      <option value="sierpe">Sierpe</option>
-                      <option value="drake">Bahía Drake</option>
-                      <option value="corcovado">Corcovado</option>
-                      <option value="isla_cano">Isla del Caño</option>
+                      {puertos?.map((puerto) => (
+                        <option key={puerto.id} value={puerto.id}>
+                          {puerto.nombre}
+                        </option>
+                      ))}
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -84,10 +108,11 @@ function ReservationForm() {
                       required
                     >
                       <option value="">Selecciona el destino</option>
-                      <option value="sierpe">Sierpe</option>
-                      <option value="drake">Bahía Drake</option>
-                      <option value="corcovado">Corcovado</option>
-                      <option value="isla_cano">Isla del Caño</option>
+                      {puertos?.map((puerto) => (
+                        <option key={puerto.id} value={puerto.id}>
+                          {puerto.nombre}
+                        </option>
+                      ))}
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -126,13 +151,11 @@ function ReservationForm() {
                       required
                     >
                       <option value="">Selecciona el horario</option>
-                      <option value="07:00">07:00 AM</option>
-                      <option value="08:30">08:30 AM</option>
-                      <option value="10:00">10:00 AM</option>
-                      <option value="11:30">11:30 AM</option>
-                      <option value="13:00">01:00 PM</option>
-                      <option value="14:30">02:30 PM</option>
-                      <option value="16:00">04:00 PM</option>
+                      {horarios?.map((horario) => (
+                        <option key={horario.id} value={horario.id}>
+                          {horario.hora}
+                        </option>
+                      ))}
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -193,11 +216,11 @@ function ReservationForm() {
                       required
                     >
                       <option value="">Selecciona el hotel</option>
-                      <option value="hotel_drake_bay">Hotel Drake Bay</option>
-                      <option value="la_paloma_lodge">La Paloma Lodge</option>
-                      <option value="aguila_de_osa">Aguila de Osa Inn</option>
-                      <option value="pirate_cove">Pirate Cove</option>
-                      <option value="drake_bay_resort">Drake Bay Resort</option>
+                      {operadoresHoteles?.map((hotel) => (
+                        <option key={hotel.id} value={hotel.id}>
+                          {hotel.nombre}
+                        </option>
+                      ))}
                     </Form.Select>
                   </Form.Group>
                 </Col>
