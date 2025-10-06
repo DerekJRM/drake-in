@@ -2,6 +2,8 @@
  * Validaciones para formularios de la aplicación
  */
 
+import { USER_TYPES, VALIDATION_RULES } from "./constants";
+
 /**
  * Valida formato de email
  * @param {string} email - Email a validar
@@ -14,12 +16,33 @@ export const isValidEmail = (email) => {
 };
 
 /**
- * Valida que un nombre tenga mínimo 3 caracteres
+ * Valida que un nombre contenga solo caracteres válidos
+ * Permite: letras (con tildes), espacios, guiones, puntos y apóstrofes
+ * No valida longitud, solo caracteres
  * @param {string} name - Nombre a validar
- * @returns {boolean} - True si el nombre es válido
+ * @returns {boolean} - True si el nombre contiene solo caracteres válidos
  */
 export const isValidName = (name) => {
-  return name && name.trim().length >= 3;
+  if (!name || typeof name !== "string") return false;
+  // Permite letras (incluyendo acentos/tildes), espacios, guiones, apóstrofes y puntos
+  // pero previene números y caracteres especiales problemáticos
+  const validNameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.'-]+$/;
+  return validNameRegex.test(name.trim());
+};
+
+/**
+ * Valida que un texto contenga solo caracteres válidos para nombres
+ * Permite: letras (con tildes), números, espacios, guiones, puntos y apóstrofes
+ * No permite: caracteres especiales problemáticos (@, #, $, %, &, *, etc.)
+ * @param {string} text - Texto a validar
+ * @returns {boolean} - True si el texto contiene solo caracteres válidos
+ */
+export const isValidTextString = (text) => {
+  if (!text || typeof text !== "string") return false;
+  // Permite letras (incluyendo acentos/tildes), espacios, guiones, apóstrofes, puntos y números
+  // pero previene caracteres especiales problemáticos como @, #, $, %, &, *, etc.
+  const validTextRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.'-]+$/;
+  return validTextRegex.test(text.trim());
 };
 
 /**
@@ -69,8 +92,11 @@ export const validateReservationForm = (formData) => {
   }
 
   // Validar nombre
-  if (!isValidName(formData.name)) {
-    errors.name = "Ingresa tu nombre completo (mínimo 3 caracteres).";
+  if (!isRequired(formData.name)) {
+    errors.name = "Ingresa tu nombre completo.";
+  } else if (!isValidName(formData.name)) {
+    errors.name =
+      "El nombre contiene caracteres no válidos. Solo se permiten letras, espacios, guiones y puntos.";
   }
 
   // Validar email
@@ -90,22 +116,26 @@ export const validateReservationForm = (formData) => {
 
 /**
  * Valida formulario de login
- * @param {object} formData - Datos del formulario (email, password)
+ * @param {object} formData - Datos del formulario (email/username, password)
  * @returns {object} - Objeto con errores de validación
  */
 export const validateLoginForm = (formData) => {
   const errors = {};
 
+  // Validar email o nombre de usuario (campo único)
   if (!isRequired(formData.email)) {
-    errors.email = "Ingresa tu correo.";
-  } else if (!isValidEmail(formData.email)) {
-    errors.email = "Correo inválido.";
+    errors.email = "Ingresa tu correo o nombre de usuario.";
+  }
+  // Si tiene formato de email, validar que sea válido
+  // Si no tiene @, asumimos que es nombre de usuario (no validamos formato)
+  else if (formData.email.includes("@") && !isValidEmail(formData.email)) {
+    errors.email = "El formato del correo no es válido.";
   }
 
   if (!isRequired(formData.password)) {
     errors.password = "Ingresa tu contraseña.";
-  } else if (formData.password.length < 6) {
-    errors.password = "La contraseña debe tener al menos 6 caracteres.";
+  } else if (formData.password.length < VALIDATION_RULES.MIN_PASSWORD_LENGTH) {
+    errors.password = `La contraseña debe tener al menos ${VALIDATION_RULES.MIN_PASSWORD_LENGTH} caracteres.`;
   }
 
   return errors;
@@ -119,26 +149,45 @@ export const validateLoginForm = (formData) => {
 export const validateRegisterForm = (formData) => {
   const errors = {};
 
-  if (!isValidName(formData.name)) {
-    errors.name = "Ingresa tu nombre completo (mínimo 3 caracteres).";
+  // Validar tipo de usuario
+  if (!isRequired(formData.userType)) {
+    errors.userType = "Selecciona el tipo de usuario.";
   }
 
+  // Validar nombre del hotel si es tipo hotel
+  if (formData.userType === USER_TYPES.HOTEL) {
+    if (!isRequired(formData.hotelName)) {
+      errors.hotelName = "Ingresa el nombre del hotel.";
+    } else if (!isValidName(formData.hotelName)) {
+      errors.hotelName =
+        "El nombre del hotel contiene caracteres no válidos. Solo se permiten letras, espacios, guiones y puntos.";
+    }
+  }
+
+  // Validar nombre del bote si es tipo operador
+  if (formData.userType === USER_TYPES.OPERATOR) {
+    if (!isRequired(formData.boatName)) {
+      errors.boatName = "Ingresa el nombre del bote.";
+    } else if (!isValidName(formData.boatName)) {
+      errors.boatName =
+        "El nombre del bote contiene caracteres no válidos. Solo se permiten letras, espacios, guiones y puntos.";
+    }
+  }
+
+  // Validar email
   if (!isRequired(formData.email)) {
-    errors.email = "Ingresa tu correo.";
+    errors.email = "Ingresa tu correo electrónico.";
   } else if (!isValidEmail(formData.email)) {
-    errors.email = "Correo inválido.";
+    errors.email = "El correo electrónico no es válido.";
   }
 
+  // Validar contraseña
   if (!isRequired(formData.password)) {
     errors.password = "Ingresa tu contraseña.";
-  } else if (formData.password.length < 6) {
-    errors.password = "La contraseña debe tener al menos 6 caracteres.";
-  }
-
-  if (!isRequired(formData.confirmPassword)) {
-    errors.confirmPassword = "Confirma tu contraseña.";
-  } else if (formData.password !== formData.confirmPassword) {
-    errors.confirmPassword = "Las contraseñas no coinciden.";
+  } else if (formData.password.length < VALIDATION_RULES.MIN_PASSWORD_LENGTH) {
+    errors.password = `La contraseña debe tener al menos ${VALIDATION_RULES.MIN_PASSWORD_LENGTH} caracteres.`;
+  } else if (formData.password.length > VALIDATION_RULES.MAX_PASSWORD_LENGTH) {
+    errors.password = `La contraseña no puede tener más de ${VALIDATION_RULES.MAX_PASSWORD_LENGTH} caracteres.`;
   }
 
   return errors;

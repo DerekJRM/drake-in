@@ -15,14 +15,15 @@ export const HOTELS = [
 ];
 
 export const USER_TYPES = {
-  HOTEL: "hotel",
-  OPERATOR: "operator",
-  ADMIN: "admin",
+  ADMIN: "ADMIN",
+  HOTEL: "HOTEL",
+  OPERATOR: "OPERADOR",
 };
 
 export const VIEW_TYPES = {
-  HOTEL: "hotel",
-  OPERATOR: "operator",
+  HOTEL: "HOTEL",
+  OPERATOR: "OPERADOR",
+  PASAJERO: "PASAJERO",
 };
 
 export const ALERT_TYPES = {
@@ -35,4 +36,10 @@ export const ALERT_TYPES = {
 export const CONTACT_INFO = {
   EMAIL: "info@drakein.com",
   PHONE: "+506 1234-5678",
+};
+
+// Validaciones de formularios
+export const VALIDATION_RULES = {
+  MIN_PASSWORD_LENGTH: 4,
+  MAX_PASSWORD_LENGTH: 50,
 };
