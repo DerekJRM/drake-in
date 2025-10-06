@@ -10,7 +10,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ReservationsHotel from "./pages/ReservationsHotel";
-import ReservationsBote from "./pages/ReservationsBote";
+import ReservationsBoat from "./pages/ReservationsBoat";
 import RoutesPage from "./pages/RoutesAdministration";
 import NotFound from "./pages/NotFound";
 
@@ -28,8 +28,8 @@ function App() {
             element={<ReservationsHotel />}
           />
           <Route
-            path={ROUTES.RESERVATIONSBOTE}
-            element={<ReservationsBote />}
+            path={ROUTES.RESERVATIONSBOAT}
+            element={<ReservationsBoat />}
           />
           <Route path={ROUTES.ROUTES} element={<RoutesPage />} />
           <Route path="*" element={<NotFound />} />
