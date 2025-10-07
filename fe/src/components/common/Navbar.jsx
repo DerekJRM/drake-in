@@ -1,17 +1,23 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Navbar as RBNavbar, Nav, Card, NavDropdown } from "react-bootstrap";
-import { ROUTES } from "../../utils/constants";
+import { ROUTES, USER_TYPES } from "../../utils/constants";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../../resources/logo.png";
 
 const Navbar = () => {
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, getReservationsRoute } = useAuth();
+
+  // Verificar roles de usuario
+  const isAdmin = user?.rol === USER_TYPES.ADMIN;
+  const isOperator = user?.rol === USER_TYPES.OPERATOR;
+
+  // Obtener la ruta de reservaciones según el tipo de operador
+  const reservationsRoute = getReservationsRoute();
 
   const handleLogout = () => {
     // TODO: Implementar lógica de cerrar sesión
-
     logout();
   };
 
@@ -56,51 +62,61 @@ const Navbar = () => {
                 >
                   Inicio
                 </Nav.Link>
-                <Nav.Link
-                  as={Link}
-                  to={ROUTES.RESERVACIONES}
-                  active={location.pathname === ROUTES.RESERVACIONES}
-                  className="text-white px-3 py-2 rounded fw-medium"
-                  style={{
-                    backgroundColor:
-                      location.pathname === ROUTES.RESERVACIONES
-                        ? "rgba(255,255,255,0.2)"
-                        : "transparent",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Ver Reservaciones
-                </Nav.Link>
-                <Nav.Link
-                  as={Link}
-                  to={ROUTES.RUTAS}
-                  active={location.pathname === ROUTES.RUTAS}
-                  className="text-white px-3 py-2 rounded fw-medium"
-                  style={{
-                    backgroundColor:
-                      location.pathname === ROUTES.RUTAS
-                        ? "rgba(255,255,255,0.2)"
-                        : "transparent",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Administrar Rutas
-                </Nav.Link>
-                <Nav.Link
-                  as={Link}
-                  to={ROUTES.REGISTRO}
-                  active={location.pathname === ROUTES.REGISTRO}
-                  className="text-white px-3 py-2 rounded fw-medium"
-                  style={{
-                    backgroundColor:
-                      location.pathname === ROUTES.REGISTRO
-                        ? "rgba(255,255,255,0.2)"
-                        : "transparent",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  Registrar Operador
-                </Nav.Link>
+
+                {/* Link solo para OPERADOR */}
+                {isOperator && (
+                  <Nav.Link
+                    as={Link}
+                    to={reservationsRoute}
+                    active={location.pathname === reservationsRoute}
+                    className="text-white px-3 py-2 rounded fw-medium"
+                    style={{
+                      backgroundColor:
+                        location.pathname === reservationsRoute
+                          ? "rgba(255,255,255,0.2)"
+                          : "transparent",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    Ver Reservaciones
+                  </Nav.Link>
+                )}
+
+                {/* Links solo para ADMIN */}
+                {isAdmin && (
+                  <>
+                    <Nav.Link
+                      as={Link}
+                      to={ROUTES.RUTAS}
+                      active={location.pathname === ROUTES.RUTAS}
+                      className="text-white px-3 py-2 rounded fw-medium"
+                      style={{
+                        backgroundColor:
+                          location.pathname === ROUTES.RUTAS
+                            ? "rgba(255,255,255,0.2)"
+                            : "transparent",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      Administrar Rutas
+                    </Nav.Link>
+                    <Nav.Link
+                      as={Link}
+                      to={ROUTES.REGISTRO}
+                      active={location.pathname === ROUTES.REGISTRO}
+                      className="text-white px-3 py-2 rounded fw-medium"
+                      style={{
+                        backgroundColor:
+                          location.pathname === ROUTES.REGISTRO
+                            ? "rgba(255,255,255,0.2)"
+                            : "transparent",
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      Administrar Operadores
+                    </Nav.Link>
+                  </>
+                )}
 
                 {/* Mostrar Login o Menú de Usuario según estado de autenticación */}
                 {!isAuthenticated ? (

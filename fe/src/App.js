@@ -1,15 +1,17 @@
 import { Routes, Route } from "react-router-dom";
-import { ROUTES } from "./utils/constants";
+import { ROUTES, USER_TYPES } from "./utils/constants";
 
 // Components
 import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // Pages
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reservaciones from "./pages/Reservaciones";
+import ReservationsBoat from "./pages/ReservationsBoat";
 import RoutesPage from "./pages/Administracion";
 
 function App() {
@@ -20,9 +22,42 @@ function App() {
         <Routes>
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.REGISTRO} element={<Register />} />
-          <Route path={ROUTES.RESERVACIONES} element={<Reservaciones />} />
-          <Route path={ROUTES.RUTAS} element={<RoutesPage />} />
+
+          {/* Rutas protegidas solo para OPERADOR */}
+          <Route
+            path={ROUTES.RESERVACIONES_BOTE}
+            element={
+              <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
+                <ReservationsBoat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RESERVACIONES_HOTEL}
+            element={
+              <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
+                <Reservaciones />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas protegidas solo para ADMIN */}
+          <Route
+            path={ROUTES.REGISTRO}
+            element={
+              <ProtectedRoute allowedRoles={[USER_TYPES.ADMIN]}>
+                <Register />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RUTAS}
+            element={
+              <ProtectedRoute allowedRoles={[USER_TYPES.ADMIN]}>
+                <RoutesPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
       <Footer />

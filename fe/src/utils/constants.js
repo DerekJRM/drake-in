@@ -1,6 +1,7 @@
 export const ROUTES = {
   HOME: "/",
-  RESERVACIONES: "/reservationsBoat",
+  RESERVACIONES_BOTE: "/reservationsBoat",
+  RESERVACIONES_HOTEL: "/reservationsHotel",
   RUTAS: "/routes",
   REGISTRO: "/register",
   LOGIN: "/login",
@@ -18,6 +19,11 @@ export const USER_TYPES = {
   ADMIN: "ADMIN",
   HOTEL: "HOTEL",
   OPERATOR: "OPERADOR",
+};
+
+export const OPERATOR_TYPES = {
+  BOTE: "BOTE",
+  HOTEL: "HOTEL",
 };
 
 export const VIEW_TYPES = {

@@ -1,5 +1,5 @@
 import React from "react";
-import ReservacionesBote from "../components/reservations/ReservacionesBote";
+import ReservacionesBote from "../components/reservations/ReservacionesBoat";
 import ReservacionesHotel from "../components/reservations/ReservacionesHotel";
 import { Container } from 'react-bootstrap';
 

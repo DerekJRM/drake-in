@@ -1,12 +1,25 @@
 package com.example.be.controller;
 
-import com.example.be.model.*;
-import com.example.be.service.I_Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.be.model.Horario;
+import com.example.be.model.Operador;
+import com.example.be.model.Puerto;
+import com.example.be.model.Reserva;
+import com.example.be.model.Ruta;
+import com.example.be.model.Usuario;
+import com.example.be.service.I_Service;
 
 @RestController
 @RequestMapping("/api/")
@@ -66,6 +79,11 @@ public class Controller {
     @GetMapping("findOperadoresByTipo")
     public ResponseEntity<?> findOperadoresByTipo(@RequestParam String tipo) {
         return ResponseEntity.ok(service.findOperadoresByTipo(tipo));
+    }
+
+    @GetMapping("findTipoOperadorByUsuarioId")
+    public ResponseEntity<?> findTipoOperadorByUsuarioId(@RequestParam Long id){
+        return ResponseEntity.ok(service.findTipoOperadorByUsuarioId(id));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")

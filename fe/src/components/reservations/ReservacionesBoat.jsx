@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Card, Form, Button, Spinner, Alert } from 'react-bootstrap';
 
-const ReservacionesBote = () => {
+const ReservacionesBoat = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -237,4 +237,4 @@ const ReservacionesBote = () => {
   );
 };
 
-export default ReservacionesBote;
+export default ReservacionesBoat;

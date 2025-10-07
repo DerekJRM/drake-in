@@ -99,6 +99,13 @@ public class Service implements I_Service {
     }
 
     @Override
+    public String findTipoOperadorByUsuarioId(Long id){
+        return operadorRepository.findByUsuarioId(id)
+                .map(Operador::getTipo)
+                .orElse(null);
+    }
+
+    @Override
     public Operador saveOperador(Operador operador) {
         try {
             if (operador.isNewItem()) {

@@ -1,8 +1,13 @@
 package com.example.be.service;
 
-import com.example.be.model.*;
-
 import java.util.List;
+
+import com.example.be.model.Horario;
+import com.example.be.model.Operador;
+import com.example.be.model.Puerto;
+import com.example.be.model.Reserva;
+import com.example.be.model.Ruta;
+import com.example.be.model.Usuario;
 
 public interface I_Service {
 
@@ -23,6 +28,8 @@ public interface I_Service {
     public List<Operador> findOperadoresByTipo(String tipo);
 
     public Operador findOperadorById(Long id);
+
+    public String findTipoOperadorByUsuarioId(Long id);
 
     public Operador saveOperador(Operador operador);
 

@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogin, useRegister } from "../../hooks/useAuth";
-import { ROUTES } from "../../utils/constants";
+import { ROUTES, OPERATOR_TYPES } from "../../utils/constants";
 import { utils } from "../utils";
+import apiRest from "../../services/api";
 
 // Crear el contexto
 const AuthContext = createContext(null);
@@ -20,6 +21,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [operatorType, setOperatorType] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -32,7 +34,27 @@ export const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const checkAuth = () => {
+  const fetchOperatorType = async (userId) => {
+    try {
+      const storedOperatorType = localStorage.getItem("operatorType");
+      if (storedOperatorType) {
+        setOperatorType(storedOperatorType);
+        return storedOperatorType;
+      }
+
+      const tipo = await apiRest.getTipoOperadorByUsuarioId(userId);
+      if (tipo) {
+        localStorage.setItem("operatorType", tipo);
+        setOperatorType(tipo);
+        return tipo;
+      }
+    } catch (error) {
+      console.error("Error al obtener tipo de operador:", error);
+    }
+    return null;
+  };
+
+  const checkAuth = async () => {
     try {
       const storedToken = localStorage.getItem("token");
       const storedUser = localStorage.getItem("user");
@@ -42,7 +64,13 @@ export const AuthProvider = ({ children }) => {
 
         // Si hay usuario guardado, usarlo
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+
+          // Si es operador, obtener su tipo
+          if (parsedUser.rol === "OPERADOR" && parsedUser.id) {
+            await fetchOperatorType(parsedUser.id);
+          }
         } else {
           // Si no hay usuario pero sí token, decodificar el token
           const decodedToken = utils.decodeToken(storedToken);
@@ -50,6 +78,11 @@ export const AuthProvider = ({ children }) => {
           if (userData) {
             localStorage.setItem("user", JSON.stringify(userData));
             setUser(userData);
+
+            // Si es operador, obtener su tipo
+            if (userData.rol === "OPERADOR" && userData.id) {
+              await fetchOperatorType(userData.id);
+            }
           }
         }
       }
@@ -58,6 +91,7 @@ export const AuthProvider = ({ children }) => {
       // Si hay error al parsear, limpiar localStorage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("operatorType");
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (credentials, options = {}) => {
     loginMutation(credentials, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         console.log("Login exitoso:", data);
 
         // El backend puede devolver solo el token (string) o un objeto { token, user }
@@ -90,6 +124,12 @@ export const AuthProvider = ({ children }) => {
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
           setUser(data.user);
+          userData = data.user;
+        }
+
+        // Si es operador, obtener su tipo
+        if (userData && userData.rol === "OPERADOR" && userData.id) {
+          await fetchOperatorType(userData.id);
         }
 
         // Ejecutar callback de éxito personalizado si existe
@@ -160,27 +200,40 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    
     // Limpiar estado
     setUser(null);
     setToken(null);
+    setOperatorType(null);
 
     // Limpiar localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("operatorType");
 
     // Navegar al login
     navigate(ROUTES.LOGIN);
   };
 
+  // Función helper para obtener la ruta de reservaciones según el tipo de operador
+  const getReservationsRoute = () => {
+    if (operatorType === OPERATOR_TYPES.BOTE) {
+      return ROUTES.RESERVACIONES_BOTE;
+    } else if (operatorType === OPERATOR_TYPES.HOTEL) {
+      return ROUTES.RESERVACIONES_HOTEL;
+    }
+    return ROUTES.RESERVACIONES_BOTE; // Default
+  };
+
   const value = {
     user,
     token,
+    operatorType,
     isAuthenticated: !!token && !!user,
     isLoading,
     login,
     register,
     logout,
+    getReservationsRoute,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
