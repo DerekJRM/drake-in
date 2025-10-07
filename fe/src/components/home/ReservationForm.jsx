@@ -108,7 +108,38 @@ function ReservationForm() {
             <Form onSubmit={handleSubmit}>
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               {/* Fila 1: Fecha y Horario */}
+=======
+
+              {/* Fila 1: Fecha y Horario */}
+              <Row className="g-3 mb-3">
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-calendar3"></i>
+                      Fecha
+                    </Form.Label>
+                    <Form.Control
+                      type="date"
+                      name="fecha"
+                      value={formData.fecha}
+                      onChange={handleChange}
+                      className="shadow-sm"
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-clock-fill"></i>
+                      Horario
+                    </Form.Label>
+                    <Form.Select
+                      name="horario"
+                      value={formData.horario}
 =======
 
               {/* Fila 1: Fecha y Horario */}
@@ -143,6 +174,57 @@ function ReservationForm() {
                       className="shadow-sm"
                       required
                     >
+                      <option value="">Selecciona el horario</option>
+                      {horarios?.map((horario) => (
+                        <option key={horario.id} value={horario.id}>
+                          {horario.hora}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Fila 2: Origen y Destino */}
+              <Row className="g-3 mb-3">
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-geo-alt-fill"></i>
+                      Origen
+                    </Form.Label>
+                    <Form.Select
+                      name="origen"
+                      value={formData.origen}
+                      onChange={handleChange}
+                      className="shadow-sm"
+                      required
+                    >
+                      <option value="">Selecciona el origen</option>
+                      {puertos?.map((puerto) => (
+                        <option key={puerto.id} value={puerto.id}>
+                          {puerto.nombre}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-flag-fill"></i>
+                      Destino
+                    </Form.Label>
+                    <Form.Select
+                      name="destino"
+                      value={formData.destino}
+>>>>>>> Stashed changes
+                      onChange={handleChange}
+                      className="shadow-sm"
+                      required
+                    >
+<<<<<<< Updated upstream
                       <option value="">Selecciona el horario</option>
                       {horarios?.map((horario) => (
                         <option key={horario.id} value={horario.id}>
@@ -223,6 +305,9 @@ function ReservationForm() {
                       required
                     >
                       <option value="">Selecciona el origen</option>
+=======
+                      <option value="">Selecciona el destino</option>
+>>>>>>> Stashed changes
                       {puertos?.map((puerto) => (
                         <option key={puerto.id} value={puerto.id}>
                           {puerto.nombre}
@@ -231,6 +316,7 @@ function ReservationForm() {
                     </Form.Select>
                   </Form.Group>
                 </Col>
+<<<<<<< Updated upstream
 
                 <Col md={6} xs={12}>
                   <Form.Group>
@@ -241,6 +327,11 @@ function ReservationForm() {
 =======
 
               {/* Fila 1: Fecha y Horario */}
+=======
+              </Row>
+
+              {/* Fila 3: Nombre y Correo */}
+>>>>>>> Stashed changes
               <Row className="g-3 mb-3">
                 <Col md={6} xs={12}>
                   <Form.Group>
