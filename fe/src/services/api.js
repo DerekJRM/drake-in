@@ -14,6 +14,7 @@ const apiRest = {
     // Listar todos los horarios
     getHorarios: async () => {
         const res = await api.get("/findAllHorarios");
+        console.log('Horarios:', res.data);
         return res.data;
     },
 

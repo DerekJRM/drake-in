@@ -1,5 +1,6 @@
 package com.example.be.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Horario {
 
     @Temporal(TemporalType.TIME)
     @Column(name="HORA", nullable=false)
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime hora;
 
     @Transient

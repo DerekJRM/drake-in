@@ -106,7 +106,7 @@ public class Controller {
         return ResponseEntity.ok(service.findReservaById(id));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+//    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping("saveReserva")
     public ResponseEntity<?> saveReserva(@RequestBody Reserva reserva) {
         try {

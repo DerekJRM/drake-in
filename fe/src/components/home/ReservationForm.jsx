@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { usePuertos } from '../../hooks/usePuertos';
 import { useHorarios } from '../../hooks/useHorarios';
 import { useOperadoresByTipo } from '../../hooks/useOperadores';
+import { useSaveReserva } from '../../hooks/useReservas';
 
 function ReservationForm() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,9 @@ function ReservationForm() {
   const { data: horarios } = useHorarios();
   const { data: operadoresHoteles } = useOperadoresByTipo('HOTEL');
 
+  // Hook de mutación para guardar la reserva
+  const { mutate: saveReserva, isLoading, isSuccess, isError } = useSaveReserva();
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -29,24 +33,44 @@ function ReservationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-      // TODO: Implementar envío al backend
-      // const response = await fetch('/api/reservations', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData)
-      // });
-      //
-      // if (!response.ok) throw new Error('Error al crear la reservación');
-      //
-      // const data = await response.json();
-      // console.log('Reservación creada:', data);
-      // // Mostrar mensaje de éxito o redireccionar
+    console.log('Datos del formulario:', formData);
+    console.log(formData.destino ? Number(formData.destino) : null);
 
-      console.log('Datos del formulario:', formData);
-      alert('Reservación creada exitosamente (mock)');
+    const reservaData = {
+      rutaId: formData.horario ? parseInt(formData.horario, 10) : null,
+      nombre: formData.nombreCompleto,
+      correo: formData.email,
+      destinoId: formData.destino ? parseInt(formData.destino, 10) : null,
+      newItem: true
+    };
+
+    console.log('Datos de la reserva a enviar:', reservaData);
+
+    // Validación básica
+    if (!reservaData.rutaId || !reservaData.destinoId) {
+      alert('Debe seleccionar un horario y un destino válidos.');
+      return;
+    }
+
+    // Ejecutar la mutación
+    saveReserva(reservaData, {
+      onSuccess: () => {
+        alert('Reservación creada exitosamente.');
+        setFormData({
+          origen: '',
+          destino: '',
+          fecha: '',
+          horario: '',
+          nombreCompleto: '',
+          email: '',
+          hotel: ''
+        });
+      },
+      onError: (err) => {
+        console.error('Error al crear la reserva:', err);
+        alert('Error al crear la reservación.');
+      }
+    });
   };
 
   return (
@@ -69,7 +93,51 @@ function ReservationForm() {
             <hr className="my-4" style={{ opacity: 0.1 }} />
 
             <Form onSubmit={handleSubmit}>
-              {/* Fila 1: Origen y Destino */}
+              
+              {/* Fila 1: Fecha y Horario */}
+              <Row className="g-3 mb-3">
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-calendar3"></i>
+                      Fecha
+                    </Form.Label>
+                    <Form.Control
+                      type="date"
+                      name="fecha"
+                      value={formData.fecha}
+                      onChange={handleChange}
+                      className="shadow-sm"
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={6} xs={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                      <i className="bi bi-clock-fill"></i>
+                      Horario
+                    </Form.Label>
+                    <Form.Select
+                      name="horario"
+                      value={formData.horario}
+                      onChange={handleChange}
+                      className="shadow-sm"
+                      required
+                    >
+                      <option value="">Selecciona el horario</option>
+                      {horarios?.map((horario) => (
+                        <option key={horario.id} value={horario.id}>
+                          {horario.hora}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Fila 2: Origen y Destino */}
               <Row className="g-3 mb-3">
                 <Col md={6} xs={12}>
                   <Form.Group>
@@ -111,49 +179,6 @@ function ReservationForm() {
                       {puertos?.map((puerto) => (
                         <option key={puerto.id} value={puerto.id}>
                           {puerto.nombre}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-              </Row>
-
-              {/* Fila 2: Fecha y Horario */}
-              <Row className="g-3 mb-3">
-                <Col md={6} xs={12}>
-                  <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
-                      <i className="bi bi-calendar3"></i>
-                      Fecha
-                    </Form.Label>
-                    <Form.Control
-                      type="date"
-                      name="fecha"
-                      value={formData.fecha}
-                      onChange={handleChange}
-                      className="shadow-sm"
-                      required
-                    />
-                  </Form.Group>
-                </Col>
-
-                <Col md={6} xs={12}>
-                  <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
-                      <i className="bi bi-clock-fill"></i>
-                      Horario
-                    </Form.Label>
-                    <Form.Select
-                      name="horario"
-                      value={formData.horario}
-                      onChange={handleChange}
-                      className="shadow-sm"
-                      required
-                    >
-                      <option value="">Selecciona el horario</option>
-                      {horarios?.map((horario) => (
-                        <option key={horario.id} value={horario.id}>
-                          {horario.hora}
                         </option>
                       ))}
                     </Form.Select>
@@ -213,7 +238,6 @@ function ReservationForm() {
                       value={formData.hotel}
                       onChange={handleChange}
                       className="shadow-sm"
-                      required
                     >
                       <option value="">Selecciona el hotel</option>
                       {operadoresHoteles?.map((hotel) => (
@@ -232,17 +256,16 @@ function ReservationForm() {
               <div className="d-flex justify-content-center">
                 <Button 
                   type="submit"
+                  disabled={isLoading}
                   className="text-white fw-semibold shadow-sm border-0 d-flex align-items-center gap-3 px-4 py-3"
                   style={{ 
                     backgroundColor: '#6a92b2',
                     fontSize: '18px',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a8099'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6a92b2'}
                 >
                   <i className="bi bi-calendar-check-fill" style={{ fontSize: '1.5rem' }}></i>
-                  Reservar viaje
+                  {isLoading ? 'Guardando...' : 'Reservar viaje'}
                 </Button>
               </div>
             </Form>

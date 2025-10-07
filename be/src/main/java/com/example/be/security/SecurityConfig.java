@@ -36,6 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // --- Rutas públicas ---
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/saveReserva").permitAll()
                         .requestMatchers("/api/findAll**", "/api/find**").permitAll()  // GET públicos
                         // --- Todo lo demás requiere autenticación ---
                         .requestMatchers("/api/**").authenticated()

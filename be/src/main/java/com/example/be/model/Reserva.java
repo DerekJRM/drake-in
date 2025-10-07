@@ -1,5 +1,7 @@
 package com.example.be.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "RESERVAS")
 public class Reserva {
@@ -21,6 +24,7 @@ public class Reserva {
     @Column(name = "ID", nullable = false)
     private Long id;
 
+    @JsonProperty("rutaId")
     @Column(name = "RUTA_ID", nullable = false)
     private Long rutaId;
 
@@ -30,9 +34,11 @@ public class Reserva {
     @Column(name = "CORREO", length = 100, nullable = false)
     private String correo;
 
+    @JsonProperty("destinoId")
     @Column(name = "DESTINO_ID", nullable = false)
     private Long destinoId;
 
+    @JsonProperty("newItem")
     @Transient
     private boolean newItem;
 
@@ -41,6 +47,15 @@ public class Reserva {
 
     public boolean hasUpdatableFields() {
         return !this.updateableFields.isEmpty();
+    }
+
+    // Jackson usa este getter para booleanos
+    public boolean isNewItem() {
+        return newItem;
+    }
+
+    public void setNewItem(boolean newItem) {
+        this.newItem = newItem;
     }
 
     /**
