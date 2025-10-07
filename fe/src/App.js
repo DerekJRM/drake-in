@@ -14,22 +14,19 @@ import RoutesPage from "./pages/Administracion";
 
 function App() {
   return (
-        <div className="container-fluid">
-          <Navbar />
-          <main>
-            <Routes>
-              <Route path={ROUTES.HOME} element={<Home />} />
-              <Route path={ROUTES.LOGIN} element={<Login />} />
-              <Route path={ROUTES.REGISTRO} element={<Register />} />
-              <Route
-                path={ROUTES.RESERVACIONES}
-                element={<Reservaciones />}
-              />
-              <Route path={ROUTES.RUTAS} element={<RoutesPage />} />
-            </Routes>
-          </main>
-          <Footer />
-      </div>
+    <div className="container-fluid">
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path={ROUTES.HOME} element={<Home />} />
+          <Route path={ROUTES.LOGIN} element={<Login />} />
+          <Route path={ROUTES.REGISTRO} element={<Register />} />
+          <Route path={ROUTES.RESERVACIONES} element={<Reservaciones />} />
+          <Route path={ROUTES.RUTAS} element={<RoutesPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 }
 

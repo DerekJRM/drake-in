@@ -1,24 +1,46 @@
-
-@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
 
 .bg-info {
-    background-color: #6a92b2 !important;
+  background-color: #6a92b2 !important;
 }
 
 .text-info {
-    color: #6a92b2 !important;
+  color: #6a92b2 !important;
 }
 
 .border-info {
-    border-color: #6a92b2 !important;
+  border-color: #6a92b2 !important;
 }
 
 .btn-info {
-    background-color: #6a92b2 !important;
-    border-color: #6a92b2 !important;
+  background-color: #6a92b2 !important;
+  border-color: #6a92b2 !important;
 }
 
 .btn-info:hover {
-    background-color: #5a8099 !important;
-    border-color: #5a8099 !important;
+  background-color: #5a8099 !important;
+  border-color: #5a8099 !important;
+}
+
+/* Estilos para el dropdown de usuario en el navbar */
+.navbar .dropdown-toggle {
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.navbar .dropdown-toggle:hover,
+.navbar .dropdown-toggle:focus {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.navbar .dropdown-toggle::after {
+  color: white;
+}
+
+/* Asegurar que el texto del dropdown sea visible */
+#user-dropdown {
+  color: white !important;
+  font-weight: 500;
 }
