@@ -1,39 +1,39 @@
-import { useState } from 'react';
-import { Card, Form, Button, Row, Col } from 'react-bootstrap';
+import { useState } from "react";
+import { Card, Form, Button, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { usePuertos } from '../../hooks/usePuertos';
-import { useHorarios } from '../../hooks/useHorarios';
-import { useOperadoresByTipo } from '../../hooks/useOperadores';
-import { useSaveReserva } from '../../hooks/useReservas';
+import { usePuertos } from "../../hooks/usePuertos";
+import { useHorarios } from "../../hooks/useHorarios";
+import { useOperadoresByTipo } from "../../hooks/useOperadores";
+import { useSaveReserva } from "../../hooks/useReservas";
 
 function ReservationForm() {
   const [formData, setFormData] = useState({
-    origen: '',
-    destino: '',
-    fecha: '',
-    horario: '',
-    nombreCompleto: '',
-    email: '',
-    hotel: ''
+    origen: "",
+    destino: "",
+    fecha: "",
+    horario: "",
+    nombreCompleto: "",
+    email: "",
+    hotel: "",
   });
 
   const { data: puertos } = usePuertos();
   const { data: horarios } = useHorarios();
-  const { data: operadoresHoteles } = useOperadoresByTipo('HOTEL');
+  const { data: operadoresHoteles } = useOperadoresByTipo("HOTEL");
 
   // Hook de mutación para guardar la reserva
-  const { mutate: saveReserva, isLoading, isSuccess, isError } = useSaveReserva();
+  const { mutate: saveReserva, isLoading } = useSaveReserva();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Datos del formulario:', formData);
+    console.log("Datos del formulario:", formData);
     console.log(formData.destino ? Number(formData.destino) : null);
 
     const reservaData = {
@@ -41,35 +41,35 @@ function ReservationForm() {
       nombre: formData.nombreCompleto,
       correo: formData.email,
       destinoId: formData.destino ? parseInt(formData.destino, 10) : null,
-      newItem: true
+      newItem: true,
     };
 
-    console.log('Datos de la reserva a enviar:', reservaData);
+    console.log("Datos de la reserva a enviar:", reservaData);
 
     // Validación básica
     if (!reservaData.rutaId || !reservaData.destinoId) {
-      alert('Debe seleccionar un horario y un destino válidos.');
+      alert("Debe seleccionar un horario y un destino válidos.");
       return;
     }
 
     // Ejecutar la mutación
     saveReserva(reservaData, {
       onSuccess: () => {
-        alert('Reservación creada exitosamente.');
+        alert("Reservación creada exitosamente.");
         setFormData({
-          origen: '',
-          destino: '',
-          fecha: '',
-          horario: '',
-          nombreCompleto: '',
-          email: '',
-          hotel: ''
+          origen: "",
+          destino: "",
+          fecha: "",
+          horario: "",
+          nombreCompleto: "",
+          email: "",
+          hotel: "",
         });
       },
       onError: (err) => {
-        console.error('Error al crear la reserva:', err);
-        alert('Error al crear la reservación.');
-      }
+        console.error("Error al crear la reserva:", err);
+        alert("Error al crear la reservación.");
+      },
     });
   };
 
@@ -78,14 +78,24 @@ function ReservationForm() {
       <Col xs={12}>
         <Card className="shadow-sm">
           <Card.Body className="p-4">
-          
             {/* Título */}
             <div className="d-flex align-items-center gap-3 mb-4">
-              <div className="d-flex align-items-center justify-content-center rounded" 
-                  style={{ backgroundColor: "#6a92b2", width: "50px", height: "50px", color: "white", fontSize: "24px" }}>
+              <div
+                className="d-flex align-items-center justify-content-center rounded"
+                style={{
+                  backgroundColor: "#6a92b2",
+                  width: "50px",
+                  height: "50px",
+                  color: "white",
+                  fontSize: "24px",
+                }}
+              >
                 <i className="bi bi-calendar-plus"></i>
               </div>
-              <h2 className="mb-0 fw-bold" style={{ color: "#6a92b2", fontSize: "28px" }}>
+              <h2
+                className="mb-0 fw-bold"
+                style={{ color: "#6a92b2", fontSize: "28px" }}
+              >
                 Reservar tu viaje
               </h2>
             </div>
@@ -93,12 +103,14 @@ function ReservationForm() {
             <hr className="my-4" style={{ opacity: 0.1 }} />
 
             <Form onSubmit={handleSubmit}>
-              
               {/* Fila 1: Fecha y Horario */}
               <Row className="g-3 mb-3">
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-calendar3"></i>
                       Fecha
                     </Form.Label>
@@ -115,7 +127,10 @@ function ReservationForm() {
 
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-clock-fill"></i>
                       Horario
                     </Form.Label>
@@ -141,7 +156,10 @@ function ReservationForm() {
               <Row className="g-3 mb-3">
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-geo-alt-fill"></i>
                       Origen
                     </Form.Label>
@@ -164,7 +182,10 @@ function ReservationForm() {
 
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-flag-fill"></i>
                       Destino
                     </Form.Label>
@@ -190,7 +211,10 @@ function ReservationForm() {
               <Row className="g-3 mb-3">
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-person-fill"></i>
                       Nombre Completo
                     </Form.Label>
@@ -208,7 +232,10 @@ function ReservationForm() {
 
                 <Col md={6} xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-envelope-fill"></i>
                       Correo Electrónico
                     </Form.Label>
@@ -229,7 +256,10 @@ function ReservationForm() {
               <Row className="g-3 mb-4">
                 <Col xs={12}>
                   <Form.Group>
-                    <Form.Label className="fw-semibold d-flex align-items-center gap-2" style={{ color: '#6a92b2' }}>
+                    <Form.Label
+                      className="fw-semibold d-flex align-items-center gap-2"
+                      style={{ color: "#6a92b2" }}
+                    >
                       <i className="bi bi-building"></i>
                       Hotel de destino
                     </Form.Label>
@@ -254,22 +284,24 @@ function ReservationForm() {
 
               {/* Botón de envío */}
               <div className="d-flex justify-content-center">
-                <Button 
+                <Button
                   type="submit"
                   disabled={isLoading}
                   className="text-white fw-semibold shadow-sm border-0 d-flex align-items-center gap-3 px-4 py-3"
-                  style={{ 
-                    backgroundColor: '#6a92b2',
-                    fontSize: '18px',
-                    transition: 'all 0.2s'
+                  style={{
+                    backgroundColor: "#6a92b2",
+                    fontSize: "18px",
+                    transition: "all 0.2s",
                   }}
                 >
-                  <i className="bi bi-calendar-check-fill" style={{ fontSize: '1.5rem' }}></i>
-                  {isLoading ? 'Guardando...' : 'Reservar viaje'}
+                  <i
+                    className="bi bi-calendar-check-fill"
+                    style={{ fontSize: "1.5rem" }}
+                  ></i>
+                  {isLoading ? "Guardando..." : "Reservar viaje"}
                 </Button>
               </div>
             </Form>
-
           </Card.Body>
         </Card>
       </Col>

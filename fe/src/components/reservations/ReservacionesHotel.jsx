@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Form, Button, Spinner, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Form, Button, Spinner, Alert } from "react-bootstrap";
 
 const ReservacionesHotel = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Establecer la fecha actual por defecto
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(today);
   const [displayDate, setDisplayDate] = useState(null);
 
@@ -18,14 +18,14 @@ const ReservacionesHotel = () => {
   const fetchReservations = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // TODO: Implementar llamada al backend
       // const response = await fetch(`/api/reservations/hotel?date=${selectedDate}`);
       // if (!response.ok) throw new Error('Error al cargar las reservaciones');
       // const data = await response.json();
       // setReservations(data);
-      
+
       // Mock data temporal
       setTimeout(() => {
         const mockReservations = [
@@ -66,9 +66,8 @@ const ReservacionesHotel = () => {
         setReservations(mockReservations);
         setLoading(false);
       }, 500);
-      
     } catch (err) {
-      setError(err.message || 'Error al cargar las reservaciones');
+      setError(err.message || "Error al cargar las reservaciones");
       setLoading(false);
     }
   };
@@ -97,14 +96,24 @@ const ReservacionesHotel = () => {
       <Col xs={12}>
         <Card className="shadow-sm">
           <Card.Body className="p-4">
-            
             {/* Título */}
             <div className="d-flex align-items-center gap-3 mb-4">
-              <div className="d-flex align-items-center justify-content-center rounded" 
-                  style={{ backgroundColor: "#6a92b2", width: "50px", height: "50px", color: "white", fontSize: "24px" }}>
+              <div
+                className="d-flex align-items-center justify-content-center rounded"
+                style={{
+                  backgroundColor: "#6a92b2",
+                  width: "50px",
+                  height: "50px",
+                  color: "white",
+                  fontSize: "24px",
+                }}
+              >
                 <i className="bi bi-calendar-plus"></i>
               </div>
-              <h2 className="mb-0 fw-bold" style={{ color: "#6a92b2", fontSize: "28px" }}>
+              <h2
+                className="mb-0 fw-bold"
+                style={{ color: "#6a92b2", fontSize: "28px" }}
+              >
                 Reservaciones Realizadas
               </h2>
             </div>
@@ -127,10 +136,10 @@ const ReservacionesHotel = () => {
                   />
                 </Form.Group>
               </Col>
-              
+
               <Col md={6} xs={12}>
-                <Button 
-                  variant="info" 
+                <Button
+                  variant="info"
                   className="w-100 text-white fw-medium"
                   onClick={handleSearch}
                   disabled={loading}
@@ -145,7 +154,12 @@ const ReservacionesHotel = () => {
 
             {/* Error State */}
             {error && (
-              <Alert variant="danger" className="d-flex align-items-center" onClose={() => setError(null)} dismissible>
+              <Alert
+                variant="danger"
+                className="d-flex align-items-center"
+                onClose={() => setError(null)}
+                dismissible
+              >
                 <i className="bi bi-exclamation-triangle me-2"></i>
                 {error}
               </Alert>
@@ -154,7 +168,11 @@ const ReservacionesHotel = () => {
             {/* Loading State */}
             {loading && (
               <div className="text-center py-5">
-                <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }}>
+                <Spinner
+                  animation="border"
+                  variant="primary"
+                  style={{ width: "3rem", height: "3rem" }}
+                >
                   <span className="visually-hidden">Cargando...</span>
                 </Spinner>
               </div>
@@ -162,79 +180,90 @@ const ReservacionesHotel = () => {
 
             {/* Schedule Header - Siempre visible */}
             <Card.Header className="mb-2 bg-info text-white d-flex align-items-center gap-2 py-3 rounded">
-            <i className="bi bi-building fs-5"></i>
-            <span className="fw-semibold">
-                Reservaciones por Hotel
-            </span>
-            {displayDate && (
+              <i className="bi bi-building fs-5"></i>
+              <span className="fw-semibold">Reservaciones por Hotel</span>
+              {displayDate && (
                 <span className="ms-auto fw-medium">
-                {new Date(displayDate + 'T00:00:00').toLocaleDateString('es-ES', { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric' 
-                })}
+                  {new Date(displayDate + "T00:00:00").toLocaleDateString(
+                    "es-ES",
+                    {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    }
+                  )}
                 </span>
-            )}
+              )}
             </Card.Header>
 
             {/* Resultados */}
             {!loading && !error && (
               <Row>
                 <Col xs={12}>
-                  {Object.entries(groupedReservations).map(([schedule, reservationsList]) => (
-                    <Card key={schedule} className="mb-2 overflow-hidden">
-
-                      {/* Time and Passengers */}
-                      <Card.Body className="p-4">
-                        {/* Time Badge */}
-                        <div className="bg-light border-start border-info border-4 p-3 mb-3 rounded">
-                          <div className="d-flex align-items-center gap-2 mb-2">
-                            <i className="bi bi-building text-info"></i>
-                            <span className="fw-semibold">
-                              {reservationsList[0]?.hotel || "Hotel"}
-                            </span>
-                            <i className="bi bi-clock text-info ms-auto"></i>
-                            <span className="fw-medium">({schedule})</span>
-                          </div>
-                          <div className="d-flex align-items-center gap-2">
-                            <i className="bi bi-people-fill text-info"></i>
-                            <span className="fw-medium">
-                              {reservationsList.length} personas
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Passengers List */}
-                        <div className="d-flex flex-column gap-2 ps-2">
-                          {reservationsList.map((reservation) => (
-                            <div 
-                              key={reservation.id} 
-                              className="bg-light p-2 px-3 rounded d-flex align-items-center gap-2"
-                              style={{ transition: 'background-color 0.2s' }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-                            >
-                              <i className="bi bi-person-fill text-secondary"></i>
-                              <span style={{ fontSize: '14px' }}>
-                                {reservation.passengerName}
+                  {Object.entries(groupedReservations).map(
+                    ([schedule, reservationsList]) => (
+                      <Card key={schedule} className="mb-2 overflow-hidden">
+                        {/* Time and Passengers */}
+                        <Card.Body className="p-4">
+                          {/* Time Badge */}
+                          <div className="bg-light border-start border-info border-4 p-3 mb-3 rounded">
+                            <div className="d-flex align-items-center gap-2 mb-2">
+                              <i className="bi bi-building text-info"></i>
+                              <span className="fw-semibold">
+                                {reservationsList[0]?.hotel || "Hotel"}
+                              </span>
+                              <i className="bi bi-clock text-info ms-auto"></i>
+                              <span className="fw-medium">({schedule})</span>
+                            </div>
+                            <div className="d-flex align-items-center gap-2">
+                              <i className="bi bi-people-fill text-info"></i>
+                              <span className="fw-medium">
+                                {reservationsList.length} personas
                               </span>
                             </div>
-                          ))}
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  ))}
+                          </div>
 
-                  {Object.keys(groupedReservations).length === 0 && displayDate && (
-                    <Alert variant="info" className="d-flex align-items-center">
-                      <i className="bi bi-info-circle me-2"></i>
-                      No hay reservaciones para mostrar
-                    </Alert>
+                          {/* Passengers List */}
+                          <div className="d-flex flex-column gap-2 ps-2">
+                            {reservationsList.map((reservation) => (
+                              <div
+                                key={reservation.id}
+                                className="bg-light p-2 px-3 rounded d-flex align-items-center gap-2"
+                                style={{ transition: "background-color 0.2s" }}
+                                onMouseEnter={(e) =>
+                                  (e.currentTarget.style.backgroundColor =
+                                    "#e9ecef")
+                                }
+                                onMouseLeave={(e) =>
+                                  (e.currentTarget.style.backgroundColor =
+                                    "#f8f9fa")
+                                }
+                              >
+                                <i className="bi bi-person-fill text-secondary"></i>
+                                <span style={{ fontSize: "14px" }}>
+                                  {reservation.passengerName}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    )
                   )}
+
+                  {Object.keys(groupedReservations).length === 0 &&
+                    displayDate && (
+                      <Alert
+                        variant="info"
+                        className="d-flex align-items-center"
+                      >
+                        <i className="bi bi-info-circle me-2"></i>
+                        No hay reservaciones para mostrar
+                      </Alert>
+                    )}
                 </Col>
               </Row>
             )}
-
           </Card.Body>
         </Card>
       </Col>

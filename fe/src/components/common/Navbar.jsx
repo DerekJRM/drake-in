@@ -17,7 +17,6 @@ const Navbar = () => {
   const reservationsRoute = getReservationsRoute();
 
   const handleLogout = () => {
-    // TODO: Implementar lógica de cerrar sesión
     logout();
   };
 
