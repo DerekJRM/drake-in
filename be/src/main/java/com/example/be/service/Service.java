@@ -1,10 +1,21 @@
 package com.example.be.service;
 
-import com.example.be.model.*;
-import com.example.be.repository.*;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.List;
+import com.example.be.model.Horario;
+import com.example.be.model.Operador;
+import com.example.be.model.Puerto;
+import com.example.be.model.Reserva;
+import com.example.be.model.Ruta;
+import com.example.be.model.Usuario;
+import com.example.be.repository.HorarioRepository;
+import com.example.be.repository.OperadorRepository;
+import com.example.be.repository.PuertoRepository;
+import com.example.be.repository.ReservaRepository;
+import com.example.be.repository.RutaRepository;
+import com.example.be.repository.UsuarioRepository;
 
 @org.springframework.stereotype.Service
 public class Service implements I_Service {
@@ -98,6 +109,13 @@ public class Service implements I_Service {
                 }
 
                 Operador operadorFrontend = this.findOperadorById(operador.getId());
+                
+                // Si no existe el operador, lanzar error claro
+                if (operadorFrontend == null) {
+                    throw new Exception("No se encontró el operador con ID: " + operador.getId() + 
+                                      ". Para crear un nuevo operador, envía 'newItem': true y omite el 'id'.");
+                }
+                
                 operadorFrontend.applyUpdateableFields(operador);
 
                 this.operadorRepository.saveAndFlush(operadorFrontend);
