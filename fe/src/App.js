@@ -11,7 +11,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reservaciones from "./pages/Reservaciones";
-import ReservationsBoat from "./pages/ReservationsBoat";
 import RoutesPage from "./pages/Administracion";
 
 function App() {
@@ -25,15 +24,7 @@ function App() {
 
           {/* Rutas protegidas solo para OPERADOR */}
           <Route
-            path={ROUTES.RESERVACIONES_BOTE}
-            element={
-              <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
-                <ReservationsBoat />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.RESERVACIONES_HOTEL}
+            path={ROUTES.RESERVACIONES}
             element={
               <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
                 <Reservaciones />

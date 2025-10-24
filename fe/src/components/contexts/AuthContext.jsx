@@ -217,11 +217,11 @@ export const AuthProvider = ({ children }) => {
   // Función helper para obtener la ruta de reservaciones según el tipo de operador
   const getReservationsRoute = () => {
     if (operatorType === OPERATOR_TYPES.BOTE) {
-      return ROUTES.RESERVACIONES_BOTE;
+      return ROUTES.RESERVACIONES;
     } else if (operatorType === OPERATOR_TYPES.HOTEL) {
-      return ROUTES.RESERVACIONES_HOTEL;
+      return ROUTES.RESERVACIONES;
     }
-    return ROUTES.RESERVACIONES_BOTE; // Default
+    return ROUTES.RESERVACIONES; // Default
   };
 
   const value = {

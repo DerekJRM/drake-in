@@ -1,7 +1,6 @@
 export const ROUTES = {
   HOME: "/",
-  RESERVACIONES_BOTE: "/reservationsBoat",
-  RESERVACIONES_HOTEL: "/reservationsHotel",
+  RESERVACIONES: "/reservaciones",
   RUTAS: "/routes",
   REGISTRO: "/register",
   LOGIN: "/login",
