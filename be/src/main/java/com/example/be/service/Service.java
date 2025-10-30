@@ -1,6 +1,7 @@
 package com.example.be.service;
 
 import java.util.List;
+import java.util.UUID; // Para Email
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +17,7 @@ import com.example.be.repository.PuertoRepository;
 import com.example.be.repository.ReservaRepository;
 import com.example.be.repository.RutaRepository;
 import com.example.be.repository.UsuarioRepository;
+import org.springframework.data.mapping.TargetAwareIdentifierAccessor;
 
 @org.springframework.stereotype.Service
 public class Service implements I_Service {
@@ -37,6 +39,9 @@ public class Service implements I_Service {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private I_EmailService emailService;
 
     // ================================= HORARIOS =================================
 
@@ -163,8 +168,26 @@ public class Service implements I_Service {
     @Override
     public Reserva saveReserva(Reserva reserva) {
         try {
+            System.out.println("Servicio - saveReserva llamado con reserva: " + reserva);
             if (reserva.isNewItem()) {
-                return this.reservaRepository.saveAndFlush(reserva);
+                // 1. Generar un token único de cancelación
+                reserva.setCancellationToken(UUID.randomUUID().toString());
+
+                // 2. Guardar la reserva en la BD
+                Reserva savedReserva = this.reservaRepository.saveAndFlush(reserva);
+
+                // 3. Enviar el correo de confirmación (esto se ejecutará en segundo plano)
+                String origenNombre = "--", destinoNombre = "--";
+                double tarifa = 0.0;
+                try{
+                    origenNombre = findPuertoById(findRutaById(savedReserva.getRutaId()).getOrigenId()).getNombre();
+                    destinoNombre = findPuertoById(savedReserva.getDestinoId()).getNombre();
+                    tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();
+                } catch (Exception e) {   }
+
+                emailService.sendReservationConfirmation(savedReserva, origenNombre, destinoNombre, tarifa);
+
+                return savedReserva;
             } else {
                 if (reserva.getUpdateableFields() != null && reserva.getUpdateableFields().isEmpty()) {
                     throw new Exception("No se han realizado cambios en el registro.");
@@ -189,6 +212,16 @@ public class Service implements I_Service {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public void cancelReservaByToken(String token) throws Exception {
+        // Buscar la reserva por el token
+        Reserva reserva = reservaRepository.findByCancellationToken(token)
+                .orElseThrow(() -> new Exception("Token de cancelación inválido o la reserva ya fue cancelada."));
+
+        // Si se encuentra, borrarla
+        reservaRepository.delete(reserva);
     }
 
     // ================================= PUERTOS =================================

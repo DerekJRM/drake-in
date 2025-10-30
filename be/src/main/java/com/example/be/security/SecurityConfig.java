@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // --- Rutas públicas ---
+                        .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/saveReserva").permitAll()
                         .requestMatchers("/api/findAll**", "/api/find**").permitAll()  // GET públicos

@@ -145,6 +145,32 @@ public class Controller {
         }
     }
 
+    // === NUEVO ENDPOINT PÚBLICO ===
+    @GetMapping("/public/cancelReserva")
+    public ResponseEntity<String> cancelReservaByToken(@RequestParam String token) {
+        try {
+            service.cancelReservaByToken(token);
+            // Devolvemos un HTML simple para que el usuario vea una confirmación
+            String successHtml = String.format("""
+                    <html><body style='font-family: sans-serif; text-align: center;'>
+                    <h1>Reserva Cancelada</h1>
+                    <p>Tu reserva ha sido cancelada exitosamente.</p>
+                    </body></html>
+                    """);
+            return ResponseEntity.ok(successHtml);
+        } catch (Exception e) {
+            String errorHtml = String.format("""
+                    <html><body style='font-family: sans-serif; text-align: center;'>
+                    <h1>Error</h1>
+                    <p>%s</p>
+                    </body></html>
+                    """,
+                    e.getMessage()
+                    );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorHtml);
+        }
+    }
+
     // ================================= PUERTOS =================================
 
     @GetMapping("findAllPuertos")

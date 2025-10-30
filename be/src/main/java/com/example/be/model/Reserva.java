@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.apache.commons.beanutils.PropertyUtils;
+import java.util.UUID; // Para email
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -24,7 +25,7 @@ public class Reserva {
     @Column(name = "ID", nullable = false)
     private Long id;
 
-    @JsonProperty("rutaId")
+    //@JsonProperty("rutaId") // Lo comente porque daba problemas al intentar parsear el JSON
     @Column(name = "RUTA_ID", nullable = false)
     private Long rutaId;
 
@@ -34,13 +35,16 @@ public class Reserva {
     @Column(name = "CORREO", length = 100, nullable = false)
     private String correo;
 
-    @JsonProperty("destinoId")
+    //@JsonProperty("destinoId") // Lo comente porque daba problemas al intentar parsear el JSON
     @Column(name = "DESTINO_ID", nullable = false)
     private Long destinoId;
 
-    @JsonProperty("newItem")
+    //@JsonProperty("newItem") // Lo comente porque daba problemas al intentar parsear el JSON
     @Transient
     private boolean newItem;
+
+    @Column(name = "CANCELLATION_TOKEN", length = 36, unique = true)
+    private String cancellationToken;
 
     @Transient
     private List<String> updateableFields;

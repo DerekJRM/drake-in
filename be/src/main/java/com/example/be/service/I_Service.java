@@ -47,6 +47,8 @@ public interface I_Service {
 
     public void deleteReservaById(Long id);
 
+    void cancelReservaByToken(String token) throws Exception;
+
     // ================================= PUERTOS =================================
 
     public List<Puerto> findAllPuertos();
