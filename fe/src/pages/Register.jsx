@@ -1,11 +1,22 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // 'navigate' sigue aquí para el onSuccess
 import { USER_TYPES, ROUTES } from "../utils/constants";
-// import { useSaveUsuario } from "../hooks/useUsuarios";
 import { useRegister } from "../hooks/useAuth";
 import useFormValidation from "../hooks/useFormValidation";
 import { validateRegisterForm } from "../utils/validators";
-import { PasswordInput } from "../components/common";
+// Importar componentes de react-bootstrap
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Alert,
+  Spinner,
+  InputGroup,
+} from "react-bootstrap";
+// 'Link' ya no es necesario
 
 const Register = () => {
   const navigate = useNavigate();
@@ -13,19 +24,26 @@ const Register = () => {
   const { fieldErrors, validate, clearFieldError } =
     useFormValidation(validateRegisterForm);
   const [apiError, setApiError] = useState("");
+  
+  // Estados para mostrar/ocultar contraseñas
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // <-- NUEVO
 
-  const [formData, setFormData] = useState({
+  const initialState = {
     userType: "",
     hotelName: "",
     boatName: "",
     email: "",
     password: "",
-  });
+    confirmPassword: "", // <-- NUEVO
+  };
 
+  const [formData, setFormData] = useState(initialState);
+
+  // La lógica de handleChange permanece idéntica
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-      // Si cambia el tipo de usuario, resetear los campos condicionales
       if (name === "userType") {
         return {
           ...prev,
@@ -39,28 +57,28 @@ const Register = () => {
         [name]: value,
       };
     });
-
-    // Limpiar error del campo cuando el usuario empiece a escribir
     clearFieldError(name);
-
-    // Si cambia el tipo de usuario, limpiar también errores de campos condicionales
     if (name === "userType") {
       clearFieldError("hotelName");
       clearFieldError("boatName");
     }
-
     setApiError("");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setApiError(""); // Limpiar errores en cada envío
 
-    // Validar formulario
+    // --- NUEVA VALIDACIÓN ---
+    if (formData.password !== formData.confirmPassword) {
+      setApiError("Las contraseñas no coinciden. Por favor, verifíquelas.");
+      return;
+    }
+    // --- FIN NUEVA VALIDACIÓN ---
+
     if (!validate(formData)) {
       return;
     }
-
-    // Construir objeto usuario según el tipo
     const usuario = {
       usuario: formData.email,
       contrasena: formData.password,
@@ -68,14 +86,14 @@ const Register = () => {
       ...(formData.userType === USER_TYPES.HOTEL
         ? { nombre: formData.hotelName }
         : { nombre: formData.boatName }),
-        new_item: true
+      new_item: true,
     };
-
-    // Enviar al backend
     saveUsuario(usuario, {
       onSuccess: () => {
-        alert("¡Usuario registrado exitosamente! Ahora puedes iniciar sesión.");
-        navigate(ROUTES.LOGIN);
+        alert("¡Usuario registrado exitosamente!");
+        // --- LÓGICA DE SUCCESS ACTUALIZADA ---
+        // navigate(ROUTES.LOGIN); // <-- ELIMINADO
+        setFormData(initialState); // <-- AÑADIDO (Limpia el formulario)
       },
       onError: (error) => {
         console.error("Error al registrar usuario:", error);
@@ -86,127 +104,233 @@ const Register = () => {
         setApiError(errorMessage);
       },
     });
-  }
+  };
 
+  // --- RENDERIZADO (Con nuevo estilo) ---
   return (
-    <div>
-      <div>
-        <div>
-          <div>
-            <h4>Registrar Nuevo Operador</h4>
-          </div>
-          <div>
-            <form onSubmit={handleSubmit} noValidate>
-              {/* Mostrar error de API si existe */}
-              {apiError && (
-                <div
-                  style={{
-                    color: "red",
-                    marginBottom: "15px",
-                    padding: "10px",
-                    border: "1px solid red",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {apiError}
-                </div>
-              )}
+    <Container>
+      <Row className="justify-content-center mt-4"> {/* Margen reducido */}
+        <Col md={8} lg={6} xl={5}>
+          <Card className="shadow-sm border-0 rounded-3">
+            {/* Cabecera estilizada */}
+            <Card.Header
+              className="p-3 text-white text-center rounded-top" // Padding reducido
+              style={{ backgroundColor: "#6a92b2", borderBottom: "none" }}
+            >
+              <i className="bi bi-person-plus-fill" style={{fontSize: "2.5rem"}}></i>
+              <h2 className="mb-0 fw-bold">Registrar Operador</h2>
+              <p className="mb-0 opacity-75 fs-6">
+                Crea una nueva cuenta de hotel o bote
+              </p>
+            </Card.Header>
 
-              <div>
-                <label>Tipo de usuario</label>
-                <select
-                  name="userType"
-                  value={formData.userType}
-                  onChange={handleChange}
-                  required
-                  disabled={isLoading}
-                >
-                  <option value="">Selecciona el tipo de usuario</option>
-                  <option value={USER_TYPES.HOTEL}>Hotel</option>
-                  <option value={USER_TYPES.OPERATOR}>Operador de Bote</option>
-                </select>
-                {fieldErrors.userType && (
-                  <small style={{ color: "red" }}>{fieldErrors.userType}</small>
+            <Card.Body className="p-4">
+              <Form noValidate onSubmit={handleSubmit}>
+                {/* Alerta de Error de API */}
+                {apiError && (
+                  <Alert
+                    variant="danger"
+                    onClose={() => setApiError("")}
+                    dismissible
+                    className="d-flex align-items-center"
+                  >
+                    <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                    {apiError}
+                  </Alert>
                 )}
-              </div>
 
-              {formData.userType === USER_TYPES.HOTEL && (
-                <div>
-                  <label>Nombre del Hotel</label>
-                  <input
-                    type="text"
-                    name="hotelName"
-                    value={formData.hotelName}
+                {/* Tipo de Usuario */}
+                <Form.Group className="mb-3" controlId="registerUserType">
+                  <Form.Label className="fw-semibold">
+                    Tipo de usuario
+                  </Form.Label>
+                  <Form.Select
+                    name="userType"
+                    value={formData.userType}
                     onChange={handleChange}
-                    placeholder="Nombre del hotel"
                     required
                     disabled={isLoading}
-                  />
-                  {fieldErrors.hotelName && (
-                    <small style={{ color: "red" }}>
+                    className="shadow-sm"
+                    isInvalid={!!fieldErrors.userType} // <-- Manejo de error
+                  >
+                    <option value="">Selecciona el tipo de usuario</option>
+                    <option value={USER_TYPES.HOTEL}>Hotel</option>
+                    <option value={USER_TYPES.OPERATOR}>Operador de Bote</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {fieldErrors.userType}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                {/* Campo Condicional: Nombre del Hotel */}
+                {formData.userType === USER_TYPES.HOTEL && (
+                  <Form.Group className="mb-3" controlId="registerHotelName">
+                    <Form.Label className="fw-semibold">
+                      Nombre del Hotel
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="hotelName"
+                      value={formData.hotelName}
+                      onChange={handleChange}
+                      placeholder="Nombre del hotel"
+                      required
+                      disabled={isLoading}
+                      className="shadow-sm"
+                      isInvalid={!!fieldErrors.hotelName}
+                    />
+                    <Form.Control.Feedback type="invalid">
                       {fieldErrors.hotelName}
-                    </small>
-                  )}
-                </div>
-              )}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                )}
 
-              {formData.userType === USER_TYPES.OPERATOR && (
-                <div>
-                  <label>Nombre del Bote</label>
-                  <input
-                    type="text"
-                    name="boatName"
-                    value={formData.boatName}
+                {/* Campo Condicional: Nombre del Bote */}
+                {formData.userType === USER_TYPES.OPERATOR && (
+                  <Form.Group className="mb-3" controlId="registerBoatName">
+                    <Form.Label className="fw-semibold">
+                      Nombre del Bote
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="boatName"
+                      value={formData.boatName}
+                      onChange={handleChange}
+                      placeholder="Nombre del bote"
+                      required
+                      disabled={isLoading}
+                      className="shadow-sm"
+                      isInvalid={!!fieldErrors.boatName}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {fieldErrors.boatName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                )}
+
+                {/* Campo de Email */}
+                <Form.Group className="mb-3" controlId="registerEmail">
+                  <Form.Label className="fw-semibold">
+                    Correo electrónico
+                  </Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
-                    placeholder="Nombre del bote"
+                    placeholder="tu@email.com"
                     required
                     disabled={isLoading}
+                    className="shadow-sm"
+                    isInvalid={!!fieldErrors.email}
                   />
-                  {fieldErrors.boatName && (
-                    <small style={{ color: "red" }}>
-                      {fieldErrors.boatName}
-                    </small>
-                  )}
+                  <Form.Control.Feedback type="invalid">
+                    {fieldErrors.email}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                {/* Campo de Contraseña (con toggle) */}
+                <Form.Group className="mb-3" controlId="registerPassword">
+                  <Form.Label className="fw-semibold">Contraseña</Form.Label>
+                  <InputGroup hasValidation>
+                    <Form.Control
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Tu contraseña"
+                      required
+                      disabled={isLoading}
+                      className="shadow-sm"
+                      isInvalid={!!fieldErrors.password}
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
+                      style={{ borderTopRightRadius: '0.375rem', borderBottomRightRadius: '0.375rem' }}
+                    >
+                      <i
+                        className={
+                          showPassword ? "bi bi-eye-slash" : "bi bi-eye"
+                        }
+                      ></i>
+                    </Button>
+                    <Form.Control.Feedback type="invalid">
+                      {fieldErrors.password}
+                    </Form.Control.Feedback>
+                  </InputGroup>
+                </Form.Group>
+
+                {/* --- NUEVO CAMPO: CONFIRMAR CONTRASEÑA --- */}
+                <Form.Group className="mb-4" controlId="registerConfirmPassword">
+                  <Form.Label className="fw-semibold">Confirmar Contraseña</Form.Label>
+                  <InputGroup>
+                    <Form.Control
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Confirme su contraseña"
+                      required
+                      disabled={isLoading}
+                      className="shadow-sm"
+                      // No usamos isInvalid aquí ya que es un chequeo manual
+                    />
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={isLoading}
+                      style={{ borderTopRightRadius: '0.375rem', borderBottomRightRadius: '0.375rem' }}
+                    >
+                      <i
+                        className={
+                          showConfirmPassword ? "bi bi-eye-slash" : "bi bi-eye"
+                        }
+                      ></i>
+                    </Button>
+                  </InputGroup>
+                </Form.Group>
+
+
+                {/* Botón de Submit */}
+                <div className="d-grid">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="fw-semibold shadow"
+                    style={{
+                      backgroundColor: "#6a92b2",
+                      border: "none",
+                    }}
+                    size="lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Spinner
+                          as="span"
+                          animation="border"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        <span className="ms-2">Registrando...</span>
+                      </>
+                    ) : (
+                      "Registrar Operador"
+                    )}
+                  </Button>
                 </div>
-              )}
-
-              <div>
-                <label>Correo electrónico</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="tu@email.com"
-                  required
-                  disabled={isLoading}
-                />
-                {fieldErrors.email && (
-                  <small style={{ color: "red" }}>{fieldErrors.email}</small>
-                )}
-              </div>
-
-              <PasswordInput
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Tu contraseña"
-                required
-                disabled={isLoading}
-                error={fieldErrors.password}
-              />
-
-              <div>
-                <button type="submit" disabled={isLoading}>
-                  {isLoading ? "Registrando..." : "Registrar Operador"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Form>
+            </Card.Body>
+            
+            {/* --- FOOTER ELIMINADO --- */}
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
 export default Register;
+

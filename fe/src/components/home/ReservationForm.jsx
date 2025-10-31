@@ -66,7 +66,7 @@ function ReservationForm() {
         console.log('Datos de la reserva a enviar:', reservaData);      
 
         // Ejecutar la mutación
-        alert('Enviando datos de reserva...' + JSON.stringify(reservaData));
+        //alert('Enviando datos de reserva...' + JSON.stringify(reservaData));
 
         saveReserva(reservaData, {
           onSuccess: () => {

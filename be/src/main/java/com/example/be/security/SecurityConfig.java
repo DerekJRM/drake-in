@@ -38,8 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/saveReserva").permitAll()
-                        .requestMatchers("/api/findOperadorByUsuarioId").permitAll()
-                        .requestMatchers("/api/findOperadorByUsuarioId").permitAll()
+                        .requestMatchers("/api/deleteReserva").permitAll()
                         .requestMatchers("/api/findAll**", "/api/find**").permitAll()  // GET públicos
                         // --- Todo lo demás requiere autenticación ---
                         .requestMatchers("/api/**").authenticated()
