@@ -27,6 +27,8 @@ public interface I_Service {
 
     public List<Operador> findOperadoresByTipo(String tipo);
 
+    public Operador findOperadorByUsuarioId(Long usuarioId);
+
     public Operador findOperadorById(Long id);
 
     public String findTipoOperadorByUsuarioId(Long id);
@@ -36,6 +38,7 @@ public interface I_Service {
     public void deleteOperadorById(Long id);
 
     // ================================= RESERVAS =================================
+
 
     public List<Reserva> findAllReservas();
     
@@ -50,6 +53,8 @@ public interface I_Service {
     void cancelReservaByToken(String token) throws Exception;
 
     List<Reserva> findReservasByFecha(LocalDate fecha);
+
+    List<Reserva> findReservasByFechaAndHotel(LocalDate fecha, Long hotelId);
 
     // ================================= PUERTOS =================================
 

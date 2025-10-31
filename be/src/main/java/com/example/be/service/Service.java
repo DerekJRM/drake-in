@@ -108,6 +108,12 @@ public class Service implements I_Service {
     }
 
     @Override
+    public Operador findOperadorByUsuarioId(Long id){
+        return operadorRepository.findByUsuarioId(id).get();
+    }
+
+
+    @Override
     public Operador saveOperador(Operador operador) {
         try {
             if (operador.isNewItem()) {
@@ -228,6 +234,11 @@ public class Service implements I_Service {
     public List<Reserva> findReservasByFecha(LocalDate fecha) {
         // Simplemente llamamos al nuevo método del repositorio
         return reservaRepository.findByFecha(fecha);
+    }
+
+    @Override
+    public List<Reserva> findReservasByFechaAndHotel(LocalDate fecha, Long hotelId) {
+        return reservaRepository.findByFechaAndHotelId(fecha, hotelId);
     }
 
     // ================================= PUERTOS =================================

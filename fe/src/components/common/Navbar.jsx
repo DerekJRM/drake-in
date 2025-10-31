@@ -12,6 +12,7 @@ const Navbar = () => {
   // Verificar roles de usuario
   const isAdmin = user?.rol === USER_TYPES.ADMIN;
   const isOperator = user?.rol === USER_TYPES.OPERATOR;
+  const isHotel = user?.rol === USER_TYPES.HOTEL;
 
   // Obtener la ruta de reservaciones según el tipo de operador
   const reservationsRoute = getReservationsRoute();
@@ -78,6 +79,24 @@ const Navbar = () => {
                     }}
                   >
                     Ver Reservaciones
+                  </Nav.Link>
+                )}
+                {/* Link solo para OPERADOR DE HOTEL */}
+                {isHotel && (
+                  <Nav.Link
+                    as={Link}
+                    to={ROUTES.RESERVACIONES_HOTEL}
+                    active={location.pathname === ROUTES.RESERVACIONES_HOTEL}
+                    className="text-white px-3 py-2 rounded fw-medium"
+                    style={{
+                      backgroundColor:
+                        location.pathname === ROUTES.RESERVACIONES_HOTEL
+                          ? "rgba(255,255,255,0.2)"
+                          : "transparent",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    Ver Llegadas
                   </Nav.Link>
                 )}
 

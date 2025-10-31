@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByFecha(LocalDate fecha);
 
+    List<Reserva> findByFechaAndHotelId(LocalDate fecha, Long hotelId);
+
     Optional<Reserva> findByCancellationToken(String token);
 }

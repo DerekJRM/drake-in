@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogin, useRegister } from "../../hooks/useAuth";
-import { ROUTES, OPERATOR_TYPES } from "../../utils/constants";
+import { ROUTES, OPERATOR_TYPES, USER_TYPES } from "../../utils/constants"; // <-- Importar USER_TYPES
 import { utils } from "../utils";
 import apiRest from "../../services/api";
 
@@ -22,6 +22,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [operatorType, setOperatorType] = useState(null);
+  const [operadorId, setOperadorId] = useState(null); // <-- NUEVO ESTADO
+  const [operadorName, setOperadorName] = useState(null); // <-- NUEVO ESTADO
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -34,19 +36,28 @@ export const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchOperatorType = async (userId) => {
+  const fetchOperatorInfo = async (userId) => {
     try {
       const storedOperatorType = localStorage.getItem("operatorType");
-      if (storedOperatorType) {
+      const storedOperadorId = localStorage.getItem("operadorId"); // <-- NUEVO
+      const storedOperadorName = localStorage.getItem("operadorName"); // <-- NUEVO
+
+      if (storedOperatorType && storedOperadorId && storedOperadorName) {
         setOperatorType(storedOperatorType);
+        setOperadorId(storedOperadorId); // <-- NUEVO
+        setOperadorName(storedOperadorName); // <-- NUEVO
         return storedOperatorType;
       }
 
-      const tipo = await apiRest.getTipoOperadorByUsuarioId(userId);
-      if (tipo) {
-        localStorage.setItem("operatorType", tipo);
-        setOperatorType(tipo);
-        return tipo;
+      const operador = await apiRest.getOperadorByUsuarioId(userId); // <-- NUEVO ENDPOINT
+      if (operador && operador.tipo) {
+        localStorage.setItem("operatorType", operador.tipo);
+        localStorage.setItem("operadorId", operador.id); // <-- NUEVO
+        localStorage.setItem("operadorName", operador.nombre); // <-- NUEVO
+        setOperatorType(operador.tipo);
+        setOperadorId(operador.id); // <-- NUEVO
+        setOperadorName(operador.nombre); // <-- NUEVO
+        return operador.tipo;
       }
     } catch (error) {
       console.error("Error al obtener tipo de operador:", error);
@@ -68,8 +79,8 @@ export const AuthProvider = ({ children }) => {
           setUser(parsedUser);
 
           // Si es operador, obtener su tipo
-          if (parsedUser.rol === "OPERADOR" && parsedUser.id) {
-            await fetchOperatorType(parsedUser.id);
+          if ((parsedUser.rol === USER_TYPES.OPERATOR || parsedUser.rol === USER_TYPES.HOTEL) && parsedUser.id) {
+            await fetchOperatorInfo(parsedUser.id);
           }
         } else {
           // Si no hay usuario pero sí token, decodificar el token
@@ -80,8 +91,8 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
 
             // Si es operador, obtener su tipo
-            if (userData.rol === "OPERADOR" && userData.id) {
-              await fetchOperatorType(userData.id);
+            if ((userData.rol === USER_TYPES.OPERATOR || userData.rol === USER_TYPES.HOTEL) && userData.id) {
+              await fetchOperatorInfo(userData.id); // <-- MODIFICADO
             }
           }
         }
@@ -92,6 +103,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("operatorType");
+      localStorage.removeItem("operadorId"); // <-- NUEVO
+    localStorage.removeItem("operadorName"); // <-- NUEVO
     } finally {
       setIsLoading(false);
     }
@@ -128,8 +141,8 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Si es operador, obtener su tipo
-        if (userData && userData.rol === "OPERADOR" && userData.id) {
-          await fetchOperatorType(userData.id);
+        if (userData && (userData.rol === USER_TYPES.OPERATOR || userData.rol === USER_TYPES.HOTEL) && userData.id) {
+          await fetchOperatorInfo(userData.id); // <-- MODIFICADO
         }
 
         // Ejecutar callback de éxito personalizado si existe
@@ -204,11 +217,15 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken(null);
     setOperatorType(null);
+    setOperadorId(null); // <-- NUEVO
+    setOperadorName(null); // <-- NUEVO
 
     // Limpiar localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("operatorType");
+    localStorage.removeItem("operadorId"); // <-- NUEVO
+    localStorage.removeItem("operadorName"); // <-- NUEVO
 
     // Navegar al login
     navigate(ROUTES.LOGIN);
@@ -219,7 +236,7 @@ export const AuthProvider = ({ children }) => {
     if (operatorType === OPERATOR_TYPES.BOTE) {
       return ROUTES.RESERVACIONES;
     } else if (operatorType === OPERATOR_TYPES.HOTEL) {
-      return ROUTES.RESERVACIONES;
+      return ROUTES.RESERVACIONES_HOTEL; // Vista de Hotel
     }
     return ROUTES.RESERVACIONES; // Default
   };
@@ -228,6 +245,8 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     operatorType,
+    operadorId, // <-- NUEVO (Lo exponemos al resto de la app)
+    operadorName, // <-- NUEVO (Lo exponemos al resto de la app)
     isAuthenticated: !!token && !!user,
     isLoading,
     login,

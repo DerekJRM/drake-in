@@ -22,3 +22,15 @@ export const useReservasByFecha = (fecha) => {
     enabled: !!fecha, 
   });
 };
+
+// Hook para OBTENER reservaciones por fecha y hotel (PARA VISTA HOTEL)
+export const useReservasByFechaAndHotel = (fecha, hotelId) => {
+  return useQuery({
+    queryKey: ["reservas", fecha, "hotel", hotelId],
+    queryFn: () => apiRest.getReservasByFechaAndHotel(fecha, hotelId),
+    enabled: !!fecha && !!hotelId, // Solo se activa si tenemos ambos datos
+  });
+};
+
+
+

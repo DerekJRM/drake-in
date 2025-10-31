@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reservaciones from "./pages/Reservaciones";
+import ReservacionesHotel from "./pages/ReservacionesHotel";
 import RoutesPage from "./pages/Administracion";
 
 function App() {
@@ -28,6 +29,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
                 <Reservaciones />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas protegidas solo para HOTEL */}
+          <Route
+            path={ROUTES.RESERVACIONES_HOTEL}
+            element={
+              <ProtectedRoute allowedRoles={[USER_TYPES.HOTEL]}>
+                <ReservacionesHotel />
               </ProtectedRoute>
             }
           />

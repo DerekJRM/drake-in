@@ -1,102 +1,88 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Form, Button, Spinner, Alert } from "react-bootstrap";
+import React, { useState, useMemo } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Spinner,
+  Alert,
+  Accordion, // <-- 1. Importar Accordion
+} from "react-bootstrap";
+import { useAuth } from "../contexts/AuthContext"; // Importar Auth
+import { useHorarios } from "../../hooks/useHorarios"; // Importar Horarios
+import { useReservasByFechaAndHotel } from "../../hooks/useReservas"; // Importar NUEVO hook
 
 const ReservacionesHotel = () => {
-  const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Establecer la fecha actual por defecto
+  // --- 1. ESTADO ---
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(today);
-  const [displayDate, setDisplayDate] = useState(null);
+  const [displayDate, setDisplayDate] = useState(today);
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
+  // --- 2. CONTEXTO DE AUTH (CORREGIDO) ---
+  const { operadorName, operadorId, user, isLoading: isAuthLoading } = useAuth();
 
-  const fetchReservations = async () => {
-    setLoading(true);
-    setError(null);
+  // --- 3. DATA FETCHING (REACT QUERY) ---
+  const { data: horariosData, isLoading: isLoadingHorarios } = useHorarios();
+  const {
+    data: reservations,
+    isLoading: isLoadingReservas,
+    isError: isErrorReservas,
+    error: errorReservas,
+  } = useReservasByFechaAndHotel(displayDate, operadorId); // <-- Usamos el hook nuevo
 
-    try {
-      // TODO: Implementar llamada al backend
-      // const response = await fetch(`/api/reservations/hotel?date=${selectedDate}`);
-      // if (!response.ok) throw new Error('Error al cargar las reservaciones');
-      // const data = await response.json();
-      // setReservations(data);
+  // --- CORRECCIÓN DE ESTADO DE CARGA ---
+  const loading = isAuthLoading || isLoadingHorarios || isLoadingReservas;
+  const error = isErrorReservas ? errorReservas.message : null;
 
-      // Mock data temporal
-      setTimeout(() => {
-        const mockReservations = [
-          {
-            id: 1,
-            passengerName: "María González",
-            email: "maria@example.com",
-            origin: "Bocas del Toro",
-            destination: "Almirante",
-            date: "2024-01-15",
-            schedule: "08:00 AM",
-            hotel: "Drake Bay Resort",
-            status: "confirmed",
-          },
-          {
-            id: 2,
-            passengerName: "Carlos Rodríguez",
-            email: "carlos@example.com",
-            origin: "Bocas del Toro",
-            destination: "Almirante",
-            date: "2024-01-15",
-            schedule: "08:00 AM",
-            hotel: "Drake Bay Resort",
-            status: "confirmed",
-          },
-          {
-            id: 3,
-            passengerName: "Ana López",
-            email: "ana@example.com",
-            origin: "Bocas del Toro",
-            destination: "Almirante",
-            date: "2024-01-15",
-            schedule: "10:00 AM",
-            hotel: "La Paloma Lodge",
-            status: "confirmed",
-          },
-        ];
-        setReservations(mockReservations);
-        setLoading(false);
-      }, 500);
-    } catch (err) {
-      setError(err.message || "Error al cargar las reservaciones");
-      setLoading(false);
+  // --- 4. PROCESAMIENTO DE DATOS ---
+  const horariosMap = useMemo(() => {
+    if (!horariosData) return {};
+    return horariosData.reduce((map, horario) => {
+      map[horario.id] = horario.hora;
+      return map;
+    }, {});
+  }, [horariosData]);
+
+  // --- 5. LÓGICA DE AGRUPACIÓN (Más simple) ---
+  const groupedBySchedule = useMemo(() => {
+    if (!reservations || !Object.keys(horariosMap).length) {
+      return {};
     }
-  };
 
-  const groupReservationsBySchedule = () => {
-    const grouped = {};
-    reservations.forEach((reservation) => {
-      const key = `${reservation.schedule}`;
-      if (!grouped[key]) {
-        grouped[key] = [];
+    // Agrupamos solo por horario
+    const schedules = reservations.reduce((schedules, res) => {
+      const scheduleTime =
+        horariosMap[res.horario_id] || `ID: ${res.horario_id}`;
+
+      if (!schedules[scheduleTime]) {
+        schedules[scheduleTime] = {
+          totalPassengers: 0,
+          passengers: [],
+        };
       }
-      grouped[key].push(reservation);
-    });
-    return grouped;
-  };
+
+      schedules[scheduleTime].passengers.push(res);
+      schedules[scheduleTime].totalPassengers += 1; // Asumiendo 1 reserva = 1 persona
+
+      return schedules;
+    }, {});
+
+    return schedules;
+  }, [reservations, horariosMap]);
 
   const handleSearch = () => {
     setDisplayDate(selectedDate);
   };
 
-  const groupedReservations = groupReservationsBySchedule();
-
+  // --- 6. RENDERIZADO ---
   return (
     <Row className="mb-3">
       <Col xs={12}>
         <Card className="shadow-sm">
-          <Card.Body className="p-4">
+          <Card.Body className="p-lg-4 p-3"> {/* Padding responsivo */}
             {/* Título */}
-            <div className="d-flex align-items-center gap-3 mb-4">
+            <div className="d-flex flex-wrap align-items-center gap-3 mb-4"> {/* flex-wrap para responsive */}
               <div
                 className="d-flex align-items-center justify-content-center rounded"
                 style={{
@@ -107,157 +93,163 @@ const ReservacionesHotel = () => {
                   fontSize: "24px",
                 }}
               >
-                <i className="bi bi-calendar-plus"></i>
+                <i className="bi bi-door-open-fill"></i>
               </div>
-              <h2
-                className="mb-0 fw-bold"
-                style={{ color: "#6a92b2", fontSize: "28px" }}
-              >
-                Reservaciones Realizadas
-              </h2>
+              <div>
+                <h2
+                  className="mb-0 fw-bold"
+                  style={{ color: "#6a92b2", fontSize: "28px" }}
+                >
+                  Ingresos al Hotel 
+                  {user && operadorName && (
+                  <span className="ms-2">
+                     {operadorName}
+                  </span>
+                )}
+                </h2>
+                
+              </div>
             </div>
-
             <hr className="my-4" />
 
-            {/* Filters */}
+            {/* Filtros */}
             <Row className="g-3 align-items-end mb-4">
-              <Col md={6} xs={12}>
+              <Col md={7} xs={12}>
                 <Form.Group>
                   <Form.Label className="fw-medium">
                     <i className="bi bi-calendar3 text-info me-2"></i>
-                    Seleccionar fecha
+                    Seleccionar fecha de llegada
                   </Form.Label>
                   <Form.Control
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    placeholder="dd/mm/aaaa"
                   />
                 </Form.Group>
               </Col>
-
-              <Col md={6} xs={12}>
+              <Col md={5} xs={12}>
                 <Button
                   variant="info"
                   className="w-100 text-white fw-medium"
                   onClick={handleSearch}
                   disabled={loading}
                 >
-                  <i className="bi bi-search me-2"></i>
-                  Buscar
+                  {loading ? (
+                    <Spinner as="span" animation="border" size="sm" />
+                  ) : (
+                    <i className="bi bi-search me-2"></i>
+                  )}
+                  {loading ? " Buscando..." : " Buscar"}
                 </Button>
               </Col>
             </Row>
-
             <hr className="my-4" />
 
-            {/* Error State */}
+            {/* Estados de Carga y Error */}
             {error && (
-              <Alert
-                variant="danger"
-                className="d-flex align-items-center"
-                onClose={() => setError(null)}
-                dismissible
-              >
+              <Alert variant="danger" dismissible>
                 <i className="bi bi-exclamation-triangle me-2"></i>
                 {error}
               </Alert>
             )}
-
-            {/* Loading State */}
             {loading && (
               <div className="text-center py-5">
                 <Spinner
                   animation="border"
                   variant="primary"
                   style={{ width: "3rem", height: "3rem" }}
-                >
-                  <span className="visually-hidden">Cargando...</span>
-                </Spinner>
+                />
               </div>
             )}
 
-            {/* Schedule Header - Siempre visible */}
-            <Card.Header className="mb-2 bg-info text-white d-flex align-items-center gap-2 py-3 rounded">
-              <i className="bi bi-building fs-5"></i>
-              <span className="fw-semibold">Reservaciones por Hotel</span>
-              {displayDate && (
-                <span className="ms-auto fw-medium">
-                  {new Date(displayDate + "T00:00:00").toLocaleDateString(
-                    "es-ES",
-                    {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    }
-                  )}
-                </span>
-              )}
-            </Card.Header>
+            {/* Header de Resultados */}
+            {!loading && !error && (
+              <Card.Header className="mb-2 bg-info text-white d-flex flex-wrap align-items-center gap-2 py-3 rounded">
+                <i className="bi bi-calendar-check fs-5"></i>
+                <span className="fw-semibold">Llegadas programadas</span>
+                {displayDate && (
+                  <span className="ms-md-auto fw-medium"> {/* ms-md-auto para responsive */}
+                    {new Date(displayDate + "T00:00:00").toLocaleDateString(
+                      "es-ES",
+                      { day: "2-digit", month: "2-digit", year: "numeric" }
+                    )}
+                  </span>
+                )}
+              </Card.Header>
+            )}
 
-            {/* Resultados */}
+            {/* Resultados (Simple y Compacto) */}
             {!loading && !error && (
               <Row>
                 <Col xs={12}>
-                  {Object.entries(groupedReservations).map(
-                    ([schedule, reservationsList]) => (
-                      <Card key={schedule} className="mb-2 overflow-hidden">
-                        {/* Time and Passengers */}
-                        <Card.Body className="p-4">
-                          {/* Time Badge */}
-                          <div className="bg-light border-start border-info border-4 p-3 mb-3 rounded">
-                            <div className="d-flex align-items-center gap-2 mb-2">
-                              <i className="bi bi-building text-info"></i>
-                              <span className="fw-semibold">
-                                {reservationsList[0]?.hotel || "Hotel"}
-                              </span>
-                              <i className="bi bi-clock text-info ms-auto"></i>
-                              <span className="fw-medium">({schedule})</span>
+                  {Object.keys(groupedBySchedule)
+                    .sort() // Ordenamos por hora
+                    .map((scheduleTime, index) => {
+                      const groupData = groupedBySchedule[scheduleTime];
+                      return (
+                        <Card key={scheduleTime} className="mb-3 shadow-sm">
+                          {/* Cabecera del Horario */}
+                          <Card.Header className="d-flex flex-wrap justify-content-between align-items-center fw-bold bg-light p-3 gap-2">
+                            <div>
+                              <i className="bi bi-clock-fill text-info me-2"></i>
+                              Hora de Salida: {scheduleTime}
                             </div>
-                            <div className="d-flex align-items-center gap-2">
-                              <i className="bi bi-people-fill text-info"></i>
-                              <span className="fw-medium">
-                                {reservationsList.length} personas
-                              </span>
+                            <div className="text-info">
+                              <i className="bi bi-people-fill me-2"></i>
+                              {groupData.totalPassengers} Personas
                             </div>
-                          </div>
+                          </Card.Header>
 
-                          {/* Passengers List */}
-                          <div className="d-flex flex-column gap-2 ps-2">
-                            {reservationsList.map((reservation) => (
-                              <div
-                                key={reservation.id}
-                                className="bg-light p-2 px-3 rounded d-flex align-items-center gap-2"
-                                style={{ transition: "background-color 0.2s" }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#e9ecef")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#f8f9fa")
-                                }
-                              >
-                                <i className="bi bi-person-fill text-secondary"></i>
-                                <span style={{ fontSize: "14px" }}>
-                                  {reservation.passengerName}
+                          {/* --- 2. ACORDEÓN PARA PASAJEROS --- */}
+                          <Accordion flush>
+                            <Accordion.Item eventKey={String(index)}>
+                              <Accordion.Header>
+                                <span className="fw-medium text-secondary">
+                                  <i className="bi bi-list-ul me-2"></i>
+                                  Ver/Ocultar Lista de Pasajeros
                                 </span>
-                              </div>
-                            ))}
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    )
-                  )}
+                              </Accordion.Header>
+                              <Accordion.Body className="p-3">
+                                <div className="d-flex flex-column gap-2">
+                                  {groupData.passengers.map((reservation) => (
+                                    <div
+                                      key={reservation.id}
+                                      // flex-wrap para que en móvil el correo baje
+                                      className="bg-light p-2 px-3 rounded d-flex flex-wrap align-items-center gap-2"
+                                    >
+                                      <i className="bi bi-person-fill text-secondary"></i>
+                                      <span
+                                        style={{ fontSize: "14px" }}
+                                        className="fw-medium"
+                                      >
+                                        {reservation.nombre}
+                                      </span>
+                                      <span
+                                        // ms-auto en pantallas grandes, nada en pequeñas
+                                        className="text-muted ms-md-auto"
+                                        style={{ fontSize: "12px" }}
+                                      >
+                                        {reservation.correo}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </Accordion.Body>
+                            </Accordion.Item>
+                          </Accordion>
+                        </Card>
+                      );
+                    })}
 
-                  {Object.keys(groupedReservations).length === 0 &&
+                  {/* Estado Vacío */}
+                  {Object.keys(groupedBySchedule).length === 0 &&
                     displayDate && (
                       <Alert
                         variant="info"
                         className="d-flex align-items-center"
                       >
                         <i className="bi bi-info-circle me-2"></i>
-                        No hay reservaciones para mostrar
+                        No hay llegadas programadas para esta fecha.
                       </Alert>
                     )}
                 </Col>
@@ -271,3 +263,4 @@ const ReservacionesHotel = () => {
 };
 
 export default ReservacionesHotel;
+

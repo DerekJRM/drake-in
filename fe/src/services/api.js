@@ -70,9 +70,14 @@ const apiRest = {
 
     deleteOperador: async (id) => {
         const res = await api.delete("/deleteOperadorById", { params: { id } });
+        
         return res.data;
     },
 
+    getOperadorByUsuarioId: async (id) => {
+        const res = await api.get("/findOperadorByUsuarioId", { params: { id } });
+        return res.data; 
+    },
     // ================================= RESERVAS =================================
 
     getReservas: async () => {
@@ -100,9 +105,16 @@ const apiRest = {
         return res.data;
     },
 
+    // === NUEVA FUNCIÓN (Para Botes) ===
     getReservasByFecha: async (fecha) => {
         // 'fecha' debe ser un string "YYYY-MM-DD"
         const res = await api.get("/findReservasByFecha", { params: { fecha } });
+        return res.data;
+    },
+
+     // === NUEVA FUNCIÓN (Para Hoteles) ===
+    getReservasByFechaAndHotel: async (fecha, hotelId) => {
+        const res = await api.get("/findReservasByFechaAndHotel", { params: { fecha, hotelId } });
         return res.data;
     },
     
