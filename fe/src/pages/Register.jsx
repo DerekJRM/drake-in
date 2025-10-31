@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { USER_TYPES, ROUTES } from "../utils/constants";
-import { useSaveUsuario } from "../hooks/useUsuarios";
+// import { useSaveUsuario } from "../hooks/useUsuarios";
+import { useRegister } from "../hooks/useAuth";
 import useFormValidation from "../hooks/useFormValidation";
 import { validateRegisterForm } from "../utils/validators";
 import { PasswordInput } from "../components/common";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { mutate: saveUsuario, isLoading } = useSaveUsuario();
+  const { mutate: saveUsuario, isLoading } = useRegister();
   const { fieldErrors, validate, clearFieldError } =
     useFormValidation(validateRegisterForm);
   const [apiError, setApiError] = useState("");
@@ -61,12 +62,13 @@ const Register = () => {
 
     // Construir objeto usuario según el tipo
     const usuario = {
-      email: formData.email,
-      password: formData.password,
-      tipo: formData.userType,
+      usuario: formData.email,
+      contrasena: formData.password,
+      rol: formData.userType,
       ...(formData.userType === USER_TYPES.HOTEL
-        ? { nombreHotel: formData.hotelName }
-        : { nombreBote: formData.boatName }),
+        ? { nombre: formData.hotelName }
+        : { nombre: formData.boatName }),
+        new_item: true
     };
 
     // Enviar al backend
@@ -84,7 +86,7 @@ const Register = () => {
         setApiError(errorMessage);
       },
     });
-  };
+  }
 
   return (
     <div>

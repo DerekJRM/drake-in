@@ -9,7 +9,7 @@ const authApi = axios.create({
 
 const authRest = {
   register: async (usuario) => {
-    const res = await authApi.post("/register", usuario);
+    const res = await authApi.post(`/register/${usuario.nombre}`, usuario);
     return res.data; // token
   },
 

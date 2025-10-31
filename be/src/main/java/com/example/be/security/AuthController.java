@@ -2,15 +2,16 @@ package com.example.be.security;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import com.example.be.model.Operador;
+import com.example.be.repository.OperadorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.token.TokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.be.model.Usuario;
 import com.example.be.repository.UsuarioRepository;
@@ -24,19 +25,21 @@ public class AuthController {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final OperadorRepository operadorRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
                           UsuarioRepository usuarioRepository,
                           PasswordEncoder passwordEncoder,
-                          JwtService jwtService) {
+                          JwtService jwtService, OperadorRepository operadorRepository) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.operadorRepository = operadorRepository;
     }
 
-    @PostMapping("/register")
-    public String register(@RequestBody Usuario usuario) {
+    @PostMapping("/register/{nombre}")
+    public String register(@RequestBody Usuario usuario, @PathVariable("nombre") String nombre) {
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
         usuarioRepository.save(usuario);
         
@@ -44,6 +47,9 @@ public class AuthController {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("rol", usuario.getRol());
         extraClaims.put("id", usuario.getId());
+
+        operadorRepository.save(new Operador(null, nombre, usuario.getUsuario(),
+                Objects.equals(usuario.getRol(), "OPERADOR") ? "BOTE" : usuario.getRol(), usuario.getId(), true, null));
         
         return jwtService.generateToken(extraClaims, usuario);
     }
