@@ -224,6 +224,12 @@ public class Service implements I_Service {
         reservaRepository.delete(reserva);
     }
 
+    @Override
+    public List<Reserva> findReservasByFecha(LocalDate fecha) {
+        // Simplemente llamamos al nuevo método del repositorio
+        return reservaRepository.findByFecha(fecha);
+    }
+
     // ================================= PUERTOS =================================
 
     @Override

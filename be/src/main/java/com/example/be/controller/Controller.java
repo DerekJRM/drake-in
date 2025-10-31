@@ -167,6 +167,18 @@ public class Controller {
         }
     }
 
+    @GetMapping("findReservasByFecha")
+    public ResponseEntity<?> findReservasByFecha(
+            // Esta anotación es clave para convertir el string "YYYY-MM-DD" a un objeto LocalDate
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fecha
+    ) {
+        try {
+            return ResponseEntity.ok(service.findReservasByFecha(fecha));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // ================================= PUERTOS =================================
 
     @GetMapping("findAllPuertos")

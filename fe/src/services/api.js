@@ -99,6 +99,12 @@ const apiRest = {
         const res = await api.delete("/deleteReservaById", { params: { id } });
         return res.data;
     },
+
+    getReservasByFecha: async (fecha) => {
+        // 'fecha' debe ser un string "YYYY-MM-DD"
+        const res = await api.get("/findReservasByFecha", { params: { fecha } });
+        return res.data;
+    },
     
     // ================================= PUERTOS =================================
 

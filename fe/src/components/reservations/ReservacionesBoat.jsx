@@ -1,97 +1,107 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Card, Form, Button, Spinner, Alert } from "react-bootstrap";
+import React, { useState, useMemo } from "react";
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  Spinner,
+  Alert,
+  Accordion, // <-- 1. Importar Accordion
+} from "react-bootstrap";
+import { usePuertos } from "../../hooks/usePuertos";
+import { useHorarios } from "../../hooks/useHorarios";
+import { useReservasByFecha } from "../../hooks/useReservas";
 
 const ReservacionesBoat = () => {
-  const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Establecer la fecha actual por defecto
+  // --- ESTADO Y DATA FETCHING (Sin cambios) ---
   const today = new Date().toISOString().split("T")[0];
   const [selectedDate, setSelectedDate] = useState(today);
-  const [displayDate, setDisplayDate] = useState(null); // Nueva variable para la fecha a mostrar
+  const [displayDate, setDisplayDate] = useState(today);
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
+  const { data: puertosData, isLoading: isLoadingPuertos } = usePuertos();
+  const { data: horariosData, isLoading: isLoadingHorarios } = useHorarios();
+  const {
+    data: reservations,
+    isLoading: isLoadingReservas,
+    isError: isErrorReservas,
+    error: errorReservas,
+  } = useReservasByFecha(displayDate);
 
-  const fetchReservations = async () => {
-    setLoading(true);
-    setError(null);
+  const loading = isLoadingPuertos || isLoadingHorarios || isLoadingReservas;
+  const error = isErrorReservas ? errorReservas.message : null;
 
-    try {
-      // TODO: Implementar llamada al backend
-      // const response = await fetch(`/api/reservations/operator?date=${selectedDate}`);
-      // if (!response.ok) throw new Error('Error al cargar las reservaciones');
-      // const data = await response.json();
-      // setReservations(data);
+  // --- MAPEO DE IDs (Sin cambios) ---
+  const puertosMap = useMemo(() => {
+    if (!puertosData) return {};
+    return puertosData.reduce((map, puerto) => {
+      map[puerto.id] = puerto.nombre;
+      return map;
+    }, {});
+  }, [puertosData]);
 
-      // Mock data temporal
-      setTimeout(() => {
-        const mockReservations = [
-          {
-            id: 1,
-            passengerName: "María González",
-            origin: "Sierpe",
-            destination: "Drake Bay",
-            schedule: "08:00 AM",
-          },
-          {
-            id: 2,
-            passengerName: "Carlos Rodríguez",
-            origin: "Sierpe",
-            destination: "Drake Bay",
-            schedule: "08:00 AM",
-          },
-          {
-            id: 3,
-            passengerName: "Ana López",
-            origin: "Drake Bay",
-            destination: "Sierpe",
-            schedule: "10:00 AM",
-          },
-          {
-            id: 4,
-            passengerName: "Juan Pérez",
-            origin: "Drake Bay",
-            destination: "Sierpe",
-            schedule: "10:00 AM",
-          },
-        ];
-        setReservations(mockReservations);
-        setLoading(false);
-      }, 500);
-    } catch (err) {
-      setError(err.message || "Error al cargar las reservaciones");
-      setLoading(false);
+  const horariosMap = useMemo(() => {
+    if (!horariosData) return {};
+    return horariosData.reduce((map, horario) => {
+      map[horario.id] = horario.hora;
+      return map;
+    }, {});
+  }, [horariosData]);
+
+  // --- 2. NUEVA LÓGICA DE AGRUPACIÓN (Agrupa por Horario) ---
+  const groupedBySchedule = useMemo(() => {
+    if (
+      !reservations ||
+      !Object.keys(puertosMap).length ||
+      !Object.keys(horariosMap).length
+    ) {
+      return {};
     }
-  };
 
-  const groupReservationsBySchedule = () => {
-    const grouped = {};
-    reservations.forEach((reservation) => {
-      const key = `${reservation.schedule}`;
-      if (!grouped[key]) {
-        grouped[key] = [];
+    // El objeto 'schedules' tendrá: { "08:00": { totalPassengers: 5, routes: { "Sierpe -> Drake": [...] } } }
+    const schedules = reservations.reduce((schedules, res) => {
+      const originName = puertosMap[res.origen_id] || `ID: ${res.origen_id}`;
+      const destName = puertosMap[res.destino_id] || `ID: ${res.destino_id}`;
+      const scheduleTime =
+        horariosMap[res.horario_id] || `ID: ${res.horario_id}`;
+
+      const routeKey = `${originName} → ${destName}`;
+
+      // 1. Inicializar el grupo de horario si no existe
+      if (!schedules[scheduleTime]) {
+        schedules[scheduleTime] = {
+          totalPassengers: 0,
+          routes: {}, // Objeto para agrupar por ruta DENTRO del horario
+        };
       }
-      grouped[key].push(reservation);
-    });
-    return grouped;
-  };
+
+      // 2. Inicializar el grupo de ruta si no existe
+      if (!schedules[scheduleTime].routes[routeKey]) {
+        schedules[scheduleTime].routes[routeKey] = [];
+      }
+
+      // 3. Añadir pasajero a la ruta específica
+      schedules[scheduleTime].routes[routeKey].push(res);
+      // 4. Incrementar el total de pasajeros para ESE HORARIO
+      schedules[scheduleTime].totalPassengers += 1; // Asumiendo 1 reserva = 1 persona
+
+      return schedules;
+    }, {});
+
+    return schedules;
+  }, [reservations, puertosMap, horariosMap]);
 
   const handleSearch = () => {
-    setDisplayDate(selectedDate); // Actualizar la fecha a mostrar
-    fetchReservations();
+    setDisplayDate(selectedDate);
   };
 
-  const groupedReservations = groupReservationsBySchedule();
-
+  // --- 3. RENDERIZADO (con Accordion y ordenado) ---
   return (
     <Row className="mb-3">
       <Col xs={12}>
         <Card className="shadow-sm">
           <Card.Body className="p-4">
-            {/* Título */}
+            {/* Título y Filtros (Sin cambios) */}
             <div className="d-flex align-items-center gap-3 mb-4">
               <div
                 className="d-flex align-items-center justify-content-center rounded"
@@ -112,12 +122,9 @@ const ReservacionesBoat = () => {
                 Reservaciones por Ruta
               </h2>
             </div>
-
             <hr className="my-4" />
-
-            {/* Filters */}
             <Row className="g-3 align-items-end mb-4">
-              <Col md={6} xs={12}>
+              <Col md={7} xs={12}>
                 <Form.Group>
                   <Form.Label className="fw-medium">
                     <i className="bi bi-calendar3 text-info me-2"></i>
@@ -127,40 +134,40 @@ const ReservacionesBoat = () => {
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    placeholder="dd/mm/aaaa"
                   />
                 </Form.Group>
               </Col>
-
-              <Col md={6} xs={12}>
+              <Col md={5} xs={12}>
                 <Button
                   variant="info"
                   className="w-100 text-white fw-medium"
                   onClick={handleSearch}
                   disabled={loading}
                 >
-                  <i className="bi bi-search me-2"></i>
-                  Buscar
+                  {loading ? (
+                    <Spinner
+                      as="span"
+                      animation="border"
+                      size="sm"
+                      role="status"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <i className="bi bi-search me-2"></i>
+                  )}
+                  {loading ? " Buscando..." : " Buscar"}
                 </Button>
               </Col>
             </Row>
-
             <hr className="my-4" />
 
-            {/* Error State */}
+            {/* Estados de Carga y Error (Sin cambios) */}
             {error && (
-              <Alert
-                variant="danger"
-                className="d-flex align-items-center"
-                onClose={() => setError(null)}
-                dismissible
-              >
+              <Alert variant="danger" dismissible>
                 <i className="bi bi-exclamation-triangle me-2"></i>
                 {error}
               </Alert>
             )}
-
-            {/* Loading State */}
             {loading && (
               <div className="text-center py-5">
                 <Spinner
@@ -173,88 +180,113 @@ const ReservacionesBoat = () => {
               </div>
             )}
 
-            {/* Schedule Header - Siempre visible */}
-            <Card.Header className="mb-2 bg-info text-white d-flex align-items-center gap-2 py-3 rounded">
-              <i className="bi bi-building fs-5"></i>
-              <span className="fw-semibold">Reservaciones por Ruta</span>
-              {displayDate && (
-                <span className="ms-auto fw-medium">
-                  {new Date(displayDate + "T00:00:00").toLocaleDateString(
-                    "es-ES",
-                    {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    }
-                  )}
-                </span>
-              )}
-            </Card.Header>
+            {/* Header de Resultados (Sin cambios) */}
+            {!loading && !error && (
+              <Card.Header className="mb-2 bg-info text-white d-flex align-items-center gap-2 py-3 rounded">
+                <i className="bi bi-building fs-5"></i>
+                <span className="fw-semibold">Reservaciones por Ruta</span>
+                {displayDate && (
+                  <span className="ms-auto fw-medium">
+                    {new Date(displayDate + "T00:00:00").toLocaleDateString(
+                      "es-ES",
+                      {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      }
+                    )}
+                  </span>
+                )}
+              </Card.Header>
+            )}
 
-            {/* Resultados */}
+            {/* --- 4. NUEVA SECCIÓN DE RESULTADOS (Ordenada y Compacta) --- */}
             {!loading && !error && (
               <Row>
                 <Col xs={12}>
-                  {Object.entries(groupedReservations).map(
-                    ([schedule, reservationsList]) => (
-                      <Card key={schedule} className="mb-2 overflow-hidden">
-                        {/* Time and Passengers */}
-                        <Card.Body className="p-4">
-                          {/* Route Info Badge */}
-                          <div className="bg-light border-start border-info border-4 p-3 mb-3 rounded">
-                            <div className="d-flex align-items-center gap-2 mb-2">
-                              <i className="bi bi-geo-alt-fill text-info"></i>
-                              <span className="fw-semibold">
-                                {reservationsList[0]?.origin} →{" "}
-                                {reservationsList[0]?.destination}
-                              </span>
-                              <i className="bi bi-clock text-info ms-auto"></i>
-                              <span className="fw-medium">({schedule})</span>
-                            </div>
-                            <div className="d-flex align-items-center gap-2">
-                              <i className="bi bi-people-fill text-info"></i>
-                              <span className="fw-medium">
-                                {reservationsList.length} personas
-                              </span>
-                            </div>
-                          </div>
+                  {/* Object.keys(groupedBySchedule) -> ["11:00", "08:00"]
+                    .sort() -> ["08:00", "11:00"] (Ordena alfabéticamente, que funciona para horas)
+                    .map(...) -> Itera en el orden correcto
+                  */}
+                  {Object.keys(groupedBySchedule)
+                    .sort()
+                    .map((scheduleTime) => {
+                      const groupData = groupedBySchedule[scheduleTime];
+                      const routesInGroup = groupData.routes;
 
-                          {/* Passengers List */}
-                          <div className="d-flex flex-column gap-2 ps-2">
-                            {reservationsList.map((reservation) => (
-                              <div
-                                key={reservation.id}
-                                className="bg-light p-2 px-3 rounded d-flex align-items-center gap-2"
-                                style={{ transition: "background-color 0.2s" }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#e9ecef")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#f8f9fa")
-                                }
-                              >
-                                <i className="bi bi-person-fill text-secondary"></i>
-                                <span style={{ fontSize: "14px" }}>
-                                  {reservation.passengerName}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </Card.Body>
-                      </Card>
-                    )
-                  )}
+                      return (
+                        <Card key={scheduleTime} className="mb-3 shadow-sm">
+                          {/* Cabecera del Horario (con el total) */}
+                          <Card.Header className="d-flex justify-content-between align-items-center fw-bold bg-light p-3">
+                            <div>
+                              <i className="bi bi-clock-fill text-info me-2"></i>
+                              {scheduleTime}
+                            </div>
+                            <div className="text-info">
+                              <i className="bi bi-people-fill me-2"></i>
+                              {groupData.totalPassengers} Personas (Total)
+                            </div>
+                          </Card.Header>
 
-                  {Object.keys(groupedReservations).length === 0 &&
+                          {/* Acordeón para las rutas DENTRO de este horario */}
+                          <Accordion flush>
+                            {Object.entries(routesInGroup).map(
+                              ([routeKey, passengers], index) => (
+                                <Accordion.Item
+                                  eventKey={String(index)}
+                                  key={routeKey}
+                                >
+                                  <Accordion.Header>
+                                    {/* Título de cada ruta (compacto) */}
+                                    <div className="d-flex justify-content-between w-100 pe-2">
+                                      <span className="fw-semibold">
+                                        <i className="bi bi-geo-alt-fill me-2"></i>
+                                        {routeKey}
+                                      </span>
+                                      <span className="fw-medium text-muted">
+                                        {passengers.length} personas
+                                      </span>
+                                    </div>
+                                  </Accordion.Header>
+                                  <Accordion.Body className="p-2">
+                                    {/* Lista de pasajeros (compacta) */}
+                                    <div className="d-flex flex-column gap-1">
+                                      {passengers.map((reservation) => (
+                                        <div
+                                          key={reservation.id}
+                                          className="bg-light p-2 rounded d-flex align-items-center gap-2"
+                                        >
+                                          <i className="bi bi-person-fill text-secondary"></i>
+                                          <span style={{ fontSize: "14px" }}>
+                                            {reservation.nombre}
+                                          </span>
+                                          <span
+                                            className="text-muted ms-auto"
+                                            style={{ fontSize: "12px" }}
+                                          >
+                                            {reservation.correo}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </Accordion.Body>
+                                </Accordion.Item>
+                              )
+                            )}
+                          </Accordion>
+                        </Card>
+                      );
+                    })}
+
+                  {/* Estado Vacío (Sin cambios) */}
+                  {Object.keys(groupedBySchedule).length === 0 &&
                     displayDate && (
                       <Alert
                         variant="info"
                         className="d-flex align-items-center"
                       >
                         <i className="bi bi-info-circle me-2"></i>
-                        No hay reservaciones para mostrar
+                        No hay reservaciones para la fecha seleccionada.
                       </Alert>
                     )}
                 </Col>

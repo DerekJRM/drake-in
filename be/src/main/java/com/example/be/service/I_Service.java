@@ -49,6 +49,8 @@ public interface I_Service {
 
     void cancelReservaByToken(String token) throws Exception;
 
+    List<Reserva> findReservasByFecha(LocalDate fecha);
+
     // ================================= PUERTOS =================================
 
     public List<Puerto> findAllPuertos();
