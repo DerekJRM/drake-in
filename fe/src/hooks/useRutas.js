@@ -41,3 +41,17 @@ export const useDeleteRuta = () => {
     },
   });
 };
+
+// Hook para ENCONTRAR O CREAR una ruta (usado en el form de reserva)
+export const useFindOrCreateRuta = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: apiRest.findOrCreateRuta,
+    onSuccess: () => {
+      // Si esta mutación CREA una nueva ruta,
+      // es bueno invalidar la lista general de rutas.
+      queryClient.invalidateQueries({ queryKey: ["rutas"] });
+    },
+  });
+};

@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.apache.commons.beanutils.PropertyUtils;
+
+import java.time.LocalDate;
 import java.util.UUID; // Para email
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,19 +27,27 @@ public class Reserva {
     @Column(name = "ID", nullable = false)
     private Long id;
 
-    //@JsonProperty("rutaId") // Lo comente porque daba problemas al intentar parsear el JSON
-    @Column(name = "RUTA_ID", nullable = false)
-    private Long rutaId;
-
     @Column(name = "NOMBRE", length = 100, nullable = false)
     private String nombre;
 
     @Column(name = "CORREO", length = 100, nullable = false)
     private String correo;
 
+    @Column(name = "ORIGEN_ID", nullable = true)
+    private Long origenId;
+
     //@JsonProperty("destinoId") // Lo comente porque daba problemas al intentar parsear el JSON
-    @Column(name = "DESTINO_ID", nullable = false)
+    @Column(name = "DESTINO_ID", nullable = true)
     private Long destinoId;
+
+    @Column(name = "FECHA", nullable = true)
+    private LocalDate fecha;
+
+    @Column(name = "HORARIO_ID", nullable = true)
+    private Long horarioId;
+
+    @Column(name = "HOTEL_ID", nullable = true) // nullable true para hacer que el formularios de reservas quede bien.
+    private Long hotelId;
 
     //@JsonProperty("newItem") // Lo comente porque daba problemas al intentar parsear el JSON
     @Transient
@@ -54,13 +64,13 @@ public class Reserva {
     }
 
     // Jackson usa este getter para booleanos
-    public boolean isNewItem() {
-        return newItem;
-    }
+//    public boolean isNewItem() {
+//        return newItem;
+//    }
 
-    public void setNewItem(boolean newItem) {
-        this.newItem = newItem;
-    }
+//    public void setNewItem(boolean newItem) {
+//        this.newItem = newItem;
+//    }
 
     /**
      * Este metodo recibe el objeto del Frontend que contiene los campos a actualizar

@@ -1,12 +1,12 @@
 package com.example.be.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.example.be.model.Horario;
 import com.example.be.model.Operador;
 import com.example.be.model.Puerto;
 import com.example.be.model.Reserva;
-import com.example.be.model.Ruta;
 import com.example.be.model.Usuario;
 
 public interface I_Service {
@@ -39,7 +39,7 @@ public interface I_Service {
 
     public List<Reserva> findAllReservas();
     
-    public List<Reserva> findReservasByRutaId(Long rutaId);
+//    public List<Reserva> findReservasByRutaId(Long rutaId);
 
     public Reserva findReservaById(Long id);
 
@@ -59,15 +59,6 @@ public interface I_Service {
 
     public void deletePuertoById(Long id);
 
-    // ================================= RUTAS =================================
-
-    public List<Ruta> findAllRutas();
-
-    public Ruta findRutaById(Long id);
-
-    public Ruta saveRuta(Ruta ruta);
-
-    public void deleteRutaById(Long id);
 
     // ================================= USUARIO =================================
 

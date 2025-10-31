@@ -17,9 +17,10 @@ import com.example.be.model.Horario;
 import com.example.be.model.Operador;
 import com.example.be.model.Puerto;
 import com.example.be.model.Reserva;
-import com.example.be.model.Ruta;
 import com.example.be.model.Usuario;
 import com.example.be.service.I_Service;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/")
@@ -114,11 +115,6 @@ public class Controller {
         return ResponseEntity.ok(service.findAllReservas());
     }
 
-    @GetMapping("findReservasByRutaId")
-    public ResponseEntity<?> findReservasByRutaId(@RequestParam Long rutaId) {
-        return ResponseEntity.ok(service.findReservasByRutaId(rutaId));
-    }
-
     @GetMapping("findReservaById")
     public ResponseEntity<?> findReservaById(@RequestParam Long id) {
         return ResponseEntity.ok(service.findReservaById(id));
@@ -204,38 +200,7 @@ public class Controller {
         }
     }
 
-    // ================================= RUTAS =================================
 
-    @GetMapping("findAllRutas")
-    public ResponseEntity<?> findAllRutas() {
-        return ResponseEntity.ok(service.findAllRutas());
-    }
-
-    @GetMapping("findRutaById")
-    public ResponseEntity<?> findRutaById(@RequestParam Long id) {
-        return ResponseEntity.ok(service.findRutaById(id));
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @PostMapping("saveRuta")
-    public ResponseEntity<?> saveRuta(@RequestBody Ruta ruta) {
-        try {
-            return ResponseEntity.ok(service.saveRuta(ruta));
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @DeleteMapping("deleteRutaById")
-    public ResponseEntity<?> deleteRutaById(@RequestParam Long id) {
-        try {
-            service.deleteRutaById(id);
-            return ResponseEntity.ok("Registro eliminado correctamente.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
 
     // ================================= USUARIO =================================
 

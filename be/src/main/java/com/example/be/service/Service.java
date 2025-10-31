@@ -1,5 +1,7 @@
 package com.example.be.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID; // Para Email
 
@@ -9,13 +11,11 @@ import com.example.be.model.Horario;
 import com.example.be.model.Operador;
 import com.example.be.model.Puerto;
 import com.example.be.model.Reserva;
-import com.example.be.model.Ruta;
 import com.example.be.model.Usuario;
 import com.example.be.repository.HorarioRepository;
 import com.example.be.repository.OperadorRepository;
 import com.example.be.repository.PuertoRepository;
 import com.example.be.repository.ReservaRepository;
-import com.example.be.repository.RutaRepository;
 import com.example.be.repository.UsuarioRepository;
 import org.springframework.data.mapping.TargetAwareIdentifierAccessor;
 
@@ -33,9 +33,6 @@ public class Service implements I_Service {
 
     @Autowired
     private PuertoRepository puertoRepository;
-
-    @Autowired
-    private RutaRepository rutaRepository;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -155,10 +152,6 @@ public class Service implements I_Service {
         return reservaRepository.findAll();
     }
 
-    @Override
-    public List<Reserva> findReservasByRutaId(Long rutaId) {
-        return reservaRepository.findByRutaId(rutaId);
-    }
 
     @Override
     public Reserva findReservaById(Long id) {
@@ -179,13 +172,20 @@ public class Service implements I_Service {
                 // 3. Enviar el correo de confirmación (esto se ejecutará en segundo plano)
                 String origenNombre = "--", destinoNombre = "--";
                 double tarifa = 0.0;
-                try{
-                    origenNombre = findPuertoById(findRutaById(savedReserva.getRutaId()).getOrigenId()).getNombre();
-                    destinoNombre = findPuertoById(savedReserva.getDestinoId()).getNombre();
-                    tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();
-                } catch (Exception e) {   }
+                LocalDate fechaRuta = null;
+                LocalTime horaRuta = null;
 
-                emailService.sendReservationConfirmation(savedReserva, origenNombre, destinoNombre, tarifa);
+                try{origenNombre = findPuertoById(savedReserva.getOrigenId()).getNombre();} catch (Exception e) {   }
+                try{destinoNombre = findPuertoById(savedReserva.getDestinoId()).getNombre();} catch (Exception e) {   }
+
+                // TODO Lógica para saber la tarifa
+                try{tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();} catch (Exception e) {   }
+
+                try{fechaRuta = savedReserva.getFecha();} catch (Exception e) {   }
+                try{horaRuta = findHorarioById(savedReserva.getHorarioId()).getHora();} catch (Exception e) {   }
+
+
+                emailService.sendReservationConfirmation(savedReserva, origenNombre, destinoNombre, tarifa, fechaRuta, horaRuta);
 
                 return savedReserva;
             } else {
@@ -267,50 +267,6 @@ public class Service implements I_Service {
         }
     }
 
-    // ================================= RUTAS =================================
-
-    @Override
-    public List<Ruta> findAllRutas() {
-        return rutaRepository.findAll();
-    }
-
-    @Override
-    public Ruta findRutaById(Long id) {
-        return rutaRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public Ruta saveRuta(Ruta ruta) {
-        try {
-            if (ruta.isNewItem()) {
-                ruta.setId(null);
-                return this.rutaRepository.saveAndFlush(ruta);
-            } else {
-                if (ruta.getUpdateableFields() != null && ruta.getUpdateableFields().isEmpty()) {
-                    throw new Exception("No se han realizado cambios en el registro.");
-                }
-
-                Ruta rutaFrontend = this.findRutaById(ruta.getId());
-                rutaFrontend.applyUpdateableFields(ruta);
-
-                this.rutaRepository.saveAndFlush(rutaFrontend);
-
-                return rutaFrontend;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteRutaById(Long id) {
-        try {
-            rutaRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
     // ================================= USUARIO =================================
 
     @Override
@@ -353,4 +309,8 @@ public class Service implements I_Service {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+
+
+
 }

@@ -5,6 +5,7 @@ import { usePuertos } from '../../hooks/usePuertos';
 import { useHorarios } from '../../hooks/useHorarios';
 import { useOperadoresByTipo } from '../../hooks/useOperadores';
 import { useSaveReserva } from '../../hooks/useReservas';
+import { useFindOrCreateRuta } from '../../hooks/useRutas'; // <-- 1. Importar el nuevo hook
 
 function ReservationForm() {
   const [formData, setFormData] = useState({
@@ -33,41 +34,58 @@ function ReservationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const reservaData = {
-      rutaId: formData.horario ? parseInt(formData.horario, 10) : null,
-      nombre: formData.nombreCompleto,
-      correo: formData.email,
-      destinoId: formData.destino ? parseInt(formData.destino, 10) : null,
-      newItem: true
-    };
 
-    console.log('Datos de la reserva a enviar:', reservaData);
+    const rutaRequestData = {
+      fecha: formData.fecha,
+      horario_id: formData.horario ? parseInt(formData.horario, 10) : null,
+      origen_id: formData.origen ? parseInt(formData.origen, 10) : null,
+    };    
 
-    // Validación básica
-    if (!reservaData.rutaId || !reservaData.destinoId) {
-      alert('Debe seleccionar un horario y un destino válidos.');
-      return;
-    }
+    // 2. Validación simple
+    if (!rutaRequestData.fecha || !rutaRequestData.horario_id || !rutaRequestData.origen_id) {
+        alert('Debe seleccionar fecha, horario y origen.');
+        return;
+    }   
+    // 4. SI TENEMOS ÉXITO, construir la RESERVA
+        const reservaData = {
+            new_item: true,
+            origen_id: formData.origen ? parseInt(formData.origen, 10) : null, // <-- ¡EL ID CORRECTO!
+            nombre: formData.nombreCompleto,
+            correo: formData.email,
+            destino_id: formData.destino ? parseInt(formData.destino, 10) : null,
+            hotel_id: formData.hotel ? parseInt(formData.hotel, 10) : null,
+            fecha: formData.fecha,
+            horario_id: formData.horario ? parseInt(formData.horario, 10) : null,
+        };
 
-    // Ejecutar la mutación
-    saveReserva(reservaData, {
-      onSuccess: () => {
-        alert('Reservación creada exitosamente.');
-        setFormData({
-          origen: '',
-          destino: '',
-          fecha: '',
-          horario: '',
-          nombreCompleto: '',
-          email: '',
-          hotel: ''
-        });
-      },
-      onError: (err) => {
-        console.error('Error al crear la reserva:', err);
-        alert('Error al crear la reservación.');
-      }
-    });
+        // 5. Validación de la reserva
+        if (!reservaData.destino_id || !reservaData.nombre || !reservaData.correo) {
+            alert('Debe seleccionar un destino e ingresar su nombre y correo.');
+            return;
+        }
+        console.log('Datos de la reserva a enviar:', reservaData);      
+
+        // Ejecutar la mutación
+        alert('Enviando datos de reserva...' + JSON.stringify(reservaData));
+
+        saveReserva(reservaData, {
+          onSuccess: () => {
+            alert('Reservación creada exitosamente.');
+            setFormData({
+              origen: '',
+              destino: '',
+              fecha: '',
+              horario: '',
+              nombreCompleto: '',
+              email: '',
+              hotel: ''
+            });
+          },
+          onError: (err) => {
+            console.error('Error al crear la reserva:', err);
+            alert('Error al crear la reservación.');
+          }
+        });    
   };
 
   return (
