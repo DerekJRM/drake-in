@@ -86,7 +86,6 @@ const ReservacionesHotel = () => {
 
   const handleSearch = () => {
     setDisplayDate(selectedDate);
-    fetchReservations();
   };
 
   const groupedReservations = groupReservationsBySchedule();
