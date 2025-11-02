@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import { ROUTES, USER_TYPES } from "./utils/constants";
+import { OPERATOR_TYPES, ROUTES } from "./utils/constants";
 
 // Components
 import Navbar from "./components/common/Navbar";
@@ -11,7 +11,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reservaciones from "./pages/Reservaciones";
-import RoutesPage from "./pages/Administracion";
 
 function App() {
   return (
@@ -26,7 +25,7 @@ function App() {
           <Route
             path={ROUTES.RESERVACIONES}
             element={
-              <ProtectedRoute allowedRoles={[USER_TYPES.OPERATOR]}>
+              <ProtectedRoute allowedRoles={[OPERATOR_TYPES.BOTE, OPERATOR_TYPES.HOTEL]}>
                 <Reservaciones />
               </ProtectedRoute>
             }
@@ -36,16 +35,8 @@ function App() {
           <Route
             path={ROUTES.REGISTRO}
             element={
-              <ProtectedRoute allowedRoles={[USER_TYPES.ADMIN]}>
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
                 <Register />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path={ROUTES.RUTAS}
-            element={
-              <ProtectedRoute allowedRoles={[USER_TYPES.ADMIN]}>
-                <RoutesPage />
               </ProtectedRoute>
             }
           />

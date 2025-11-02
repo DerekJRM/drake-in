@@ -1,7 +1,6 @@
 export const ROUTES = {
   HOME: "/",
   RESERVACIONES: "/reservaciones",
-  RUTAS: "/routes",
   REGISTRO: "/register",
   LOGIN: "/login",
 };
@@ -13,12 +12,6 @@ export const HOTELS = [
   { value: "copa-de-arbol", label: "Copa de Árbol" },
   { value: "otro", label: "Otro hotel" },
 ];
-
-export const USER_TYPES = {
-  ADMIN: "ADMIN",
-  HOTEL: "HOTEL",
-  OPERATOR: "OPERADOR",
-};
 
 export const OPERATOR_TYPES = {
   BOTE: "BOTE",

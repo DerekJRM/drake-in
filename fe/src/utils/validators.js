@@ -2,7 +2,7 @@
  * Validaciones para formularios de la aplicación
  */
 
-import { USER_TYPES, VALIDATION_RULES } from "./constants";
+import { OPERATOR_TYPES, VALIDATION_RULES } from "./constants";
 
 /**
  * Valida formato de email
@@ -155,7 +155,7 @@ export const validateRegisterForm = (formData) => {
   }
 
   // Validar nombre del hotel si es tipo hotel
-  if (formData.userType === USER_TYPES.HOTEL) {
+  if (formData.userType === OPERATOR_TYPES.HOTEL) {
     if (!isRequired(formData.hotelName)) {
       errors.hotelName = "Ingresa el nombre del hotel.";
     } else if (!isValidName(formData.hotelName)) {
@@ -165,7 +165,7 @@ export const validateRegisterForm = (formData) => {
   }
 
   // Validar nombre del bote si es tipo operador
-  if (formData.userType === USER_TYPES.OPERATOR) {
+  if (formData.userType === OPERATOR_TYPES.OPERATOR) {
     if (!isRequired(formData.boatName)) {
       errors.boatName = "Ingresa el nombre del bote.";
     } else if (!isValidName(formData.boatName)) {

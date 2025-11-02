@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Navbar as RBNavbar, Nav, Card, NavDropdown } from "react-bootstrap";
-import { ROUTES, USER_TYPES } from "../../utils/constants";
+import { OPERATOR_TYPES, ROUTES } from "../../utils/constants";
 import { useAuth } from "../contexts/AuthContext";
 import logo from "../../resources/logo.png";
 
@@ -10,8 +10,8 @@ const Navbar = () => {
   const { isAuthenticated, user, logout, getReservationsRoute } = useAuth();
 
   // Verificar roles de usuario
-  const isAdmin = user?.rol === USER_TYPES.ADMIN;
-  const isOperator = user?.rol === USER_TYPES.OPERATOR;
+  const isAdmin = user?.rol === "ADMIN";
+  const isOperator = user?.rol === OPERATOR_TYPES.BOTE || user?.rol === OPERATOR_TYPES.HOTEL;
 
   // Obtener la ruta de reservaciones según el tipo de operador
   const reservationsRoute = getReservationsRoute();
@@ -84,21 +84,6 @@ const Navbar = () => {
                 {/* Links solo para ADMIN */}
                 {isAdmin && (
                   <>
-                    <Nav.Link
-                      as={Link}
-                      to={ROUTES.RUTAS}
-                      active={location.pathname === ROUTES.RUTAS}
-                      className="text-white px-3 py-2 rounded fw-medium"
-                      style={{
-                        backgroundColor:
-                          location.pathname === ROUTES.RUTAS
-                            ? "rgba(255,255,255,0.2)"
-                            : "transparent",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      Administrar Rutas
-                    </Nav.Link>
                     <Nav.Link
                       as={Link}
                       to={ROUTES.REGISTRO}

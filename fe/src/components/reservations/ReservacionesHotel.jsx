@@ -114,7 +114,7 @@ const ReservacionesHotel = () => {
                 className="mb-0 fw-bold"
                 style={{ color: "#6a92b2", fontSize: "28px" }}
               >
-                Reservaciones Realizadas
+                Reservaciones Por Hotel
               </h2>
             </div>
 

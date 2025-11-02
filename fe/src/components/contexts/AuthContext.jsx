@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         return storedOperatorType;
       }
 
-      const tipo = await apiRest.getTipoOperadorByUsuarioId(userId);
+      const tipo = await apiRest.findTipoOperadorByUsuarioId(userId);
       if (tipo) {
         localStorage.setItem("operatorType", tipo);
         setOperatorType(tipo);
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
           setUser(parsedUser);
 
           // Si es operador, obtener su tipo
-          if (parsedUser.rol === "OPERADOR" && parsedUser.id) {
+          if ((parsedUser.rol === "HOTEL" || parsedUser.rol === "BOTE") && parsedUser.id) {
             await fetchOperatorType(parsedUser.id);
           }
         } else {
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }) => {
             setUser(userData);
 
             // Si es operador, obtener su tipo
-            if (userData.rol === "OPERADOR" && userData.id) {
+            if ((userData.rol === "HOTEL" || userData.rol === "BOTE") && userData.id) {
               await fetchOperatorType(userData.id);
             }
           }
@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Si es operador, obtener su tipo
-        if (userData && userData.rol === "OPERADOR" && userData.id) {
+        if (userData && (userData.rol === "HOTEL" || userData.rol === "BOTE") && userData.id) {
           await fetchOperatorType(userData.id);
         }
 
@@ -216,11 +216,6 @@ export const AuthProvider = ({ children }) => {
 
   // Función helper para obtener la ruta de reservaciones según el tipo de operador
   const getReservationsRoute = () => {
-    if (operatorType === OPERATOR_TYPES.BOTE) {
-      return ROUTES.RESERVACIONES;
-    } else if (operatorType === OPERATOR_TYPES.HOTEL) {
-      return ROUTES.RESERVACIONES;
-    }
     return ROUTES.RESERVACIONES; // Default
   };
 

@@ -63,6 +63,11 @@ const apiRest = {
         return res.data;
     },
 
+    findTipoOperadorByUsuarioId: async (usuarioId) => {
+        const res = await api.get("/findTipoOperadorByUsuarioId", { params: { id: usuarioId } });
+        return res.data;
+    },
+
     saveOperador: async (operador) => {
         const res = await api.post("/saveOperador", operador);
         return res.data;
@@ -120,39 +125,6 @@ const apiRest = {
     deletePuerto: async (id) => {
         const res = await api.delete("/deletePuertoById", { params: { id } });
         return res.data;
-    },
-
-    // ================================= RUTAS =================================
-
-    getRutas: async () => {
-        const res = await api.get("/findAllRutas");
-        return res.data;
-    },
-
-    getRutaById: async (id) => {
-        const res = await api.get("/findRutaById", { params: { id } });
-        return res.data;
-    },
-
-    saveRuta: async (ruta) => {
-        const res = await api.post("/saveRuta", ruta);
-        return res.data;
-    },
-
-    deleteRuta: async (id) => {
-        const res = await api.delete("/deleteRutaById", { params: { id } });
-        return res.data;
-    },
-
-    /**
-     * Busca una ruta por fecha, horario_id y origen_id.
-     * Si no existe, la crea y devuelve el ID.
-     * @param {object} rutaRequest - { fecha: "YYYY-MM-DD", horario_id: 1, origen_id: 2 }
-     * @returns {Promise<{ruta_id: number}>} - Devuelve un objeto con el ID de la ruta
-     */
-    findOrCreateRuta: async (rutaRequest) => {
-        const res = await api.post("/findOrCreateRuta", rutaRequest);
-        return res.data; // Espera recibir { "ruta_id": 123 }
     },
 
     // ================================= USUARIO =================================
