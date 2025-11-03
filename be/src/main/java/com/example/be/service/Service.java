@@ -17,6 +17,7 @@ import com.example.be.repository.OperadorRepository;
 import com.example.be.repository.PuertoRepository;
 import com.example.be.repository.ReservaRepository;
 import com.example.be.repository.UsuarioRepository;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mapping.TargetAwareIdentifierAccessor;
 
 @org.springframework.stereotype.Service
@@ -109,7 +110,7 @@ public class Service implements I_Service {
 
     @Override
     public Operador findOperadorByUsuarioId(Long id){
-        return operadorRepository.findByUsuarioId(id).get();
+        return operadorRepository.findByUsuarioId(id).orElse(null);
     }
 
 
@@ -117,6 +118,12 @@ public class Service implements I_Service {
     public Operador saveOperador(Operador operador) {
         try {
             if (operador.isNewItem()) {
+                List<Operador> operadores = this.findAllOperadores();
+                for (Operador op : operadores) {
+                    if (op.getCorreo().equalsIgnoreCase(operador.getCorreo())) {
+                        throw new DuplicateKeyException("El correo electrónico ya está en uso. Por favor, utiliza otro correo.");
+                    }
+                }
                 return this.operadorRepository.saveAndFlush(operador);
             } else {
                 if (operador.getUpdateableFields() != null && operador.getUpdateableFields().isEmpty()) {
@@ -137,7 +144,9 @@ public class Service implements I_Service {
 
                 return operadorFrontend;
             }
-        } catch (Exception e) {
+        } catch (DuplicateKeyException dke) {
+            throw new RuntimeException("El correo electrónico ya está en uso. Por favor, utiliza otro correo.");
+        }catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }

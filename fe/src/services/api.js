@@ -83,6 +83,7 @@ const apiRest = {
         const res = await api.get("/findOperadorByUsuarioId", { params: { id } });
         return res.data; 
     },
+
     // ================================= RESERVAS =================================
 
     getReservas: async () => {
@@ -114,6 +115,7 @@ const apiRest = {
     getReservasByFecha: async (fecha) => {
         // 'fecha' debe ser un string "YYYY-MM-DD"
         const res = await api.get("/findReservasByFecha", { params: { fecha } });
+        // console.log(res.data);
         return res.data;
     },
 

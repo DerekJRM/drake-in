@@ -8,6 +8,12 @@ const Login = () => {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [validated, setValidated] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    email: "",
+    password: "",
+  });
 
   const [formData, setFormData] = useState({
     email: "",
@@ -21,23 +27,99 @@ const Login = () => {
     }
   };
 
+  // Validación de email
+  const validateEmail = (email) => {
+    if (!email.trim()) {
+      return "El correo electrónico es obligatorio";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return "El formato del correo electrónico no es válido";
+    }
+    return "";
+  };
+
+  // Validación de contraseña
+  const validatePassword = (password) => {
+    if (!password) {
+      return "La contraseña es obligatoria";
+    }
+    return "";
+  };
+
+  // Validar campo individual
+  const validateField = (name, value) => {
+    let error = "";
+    
+    switch (name) {
+      case "email":
+        error = validateEmail(value);
+        break;
+      case "password":
+        error = validatePassword(value);
+        break;
+      default:
+        break;
+    }
+
+    setFieldErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+
+    return error === "";
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: newValue,
     }));
+
+    // Validar el campo si ya se intentó enviar el formulario
+    if (validated) {
+      validateField(name, newValue);
+    }
+
     if (error) setError(null);
+  };
+
+  // Validación al perder el foco
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    if (validated) {
+      validateField(name, value);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setValidated(true);
+
+    // Validar todos los campos
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+
+    setFieldErrors({
+      email: emailError,
+      password: passwordError,
+    });
+
+    // Si hay errores, no continuar
+    if (emailError || passwordError) {
+      setError("Por favor, corrige los errores en el formulario");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     login(
       {
-        usuario: formData.email,
+        usuario: formData.email.trim(),
         contrasena: formData.password,
       },
       {
@@ -46,7 +128,10 @@ const Login = () => {
         },
         onError: (err) => {
           setIsLoading(false);
-          setError("Error al iniciar sesión");
+          setError(
+            err?.response?.data?.message || 
+            "Error al iniciar sesión. Verifica tus credenciales"
+          );
         },
       }
     );
@@ -98,11 +183,17 @@ const Login = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={handleBlur}
                   placeholder="tu@email.com"
                   required
                   disabled={isLoading}
                   size="lg"
+                  isInvalid={!!fieldErrors.email}
+                  isValid={validated && !fieldErrors.email && formData.email}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {fieldErrors.email}
+                </Form.Control.Feedback>
               </Form.Group>
 
               {/* Contraseña */}
@@ -111,15 +202,41 @@ const Login = () => {
                   <i className="bi bi-lock me-2 text-info"></i>
                   Contraseña
                 </Form.Label>
-                <PasswordInput
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Tu contraseña"
-                  required
-                  disabled={isLoading}
-                  size="lg"
-                />
+                <div className="position-relative">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="Tu contraseña"
+                    required
+                    disabled={isLoading}
+                    size="lg"
+                    isInvalid={!!fieldErrors.password}
+                    isValid={validated && !fieldErrors.password && formData.password}
+                    style={{ paddingRight: "45px" }}
+                  />
+                  <Button
+                    variant="link"
+                    className="position-absolute end-0 top-50 translate-middle-y text-muted"
+                    style={{ 
+                      border: "none", 
+                      background: "none",
+                      zIndex: 10,
+                      padding: "0.5rem 1rem"
+                    }}
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                    tabIndex={-1}
+                    type="button"
+                  >
+                    <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                  </Button>
+                </div>
+                <Form.Control.Feedback type="invalid">
+                  {fieldErrors.password}
+                </Form.Control.Feedback>
               </Form.Group>
 
               {/* Botón de inicio de sesión */}

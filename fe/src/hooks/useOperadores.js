@@ -50,3 +50,11 @@ export const useDeleteOperador = () => {
     },
   });
 };
+
+export const useOperadorByUsuarioId = (id) => {
+  return useQuery({
+    queryKey: ["operadorUsuario", id],
+    queryFn: () => apiRest.getOperadorByUsuarioId(id),
+    enabled: !!id,
+  });
+};

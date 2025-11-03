@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { usePuertos } from '../../hooks/usePuertos';
@@ -24,10 +24,85 @@ function ReservationForm() {
   // Hook de mutación para guardar la reserva
   const { mutate: saveReserva, isLoading, isSuccess, isError } = useSaveReserva();
 
+  // Calcular la fecha mínima permitida
+  const minDate = useMemo(() => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    
+    // Si ya pasaron las 4 PM (16:00), la fecha mínima es mañana
+    if (currentHour >= 16) {
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    }
+    
+    // Si no, la fecha mínima es hoy
+    return now.toISOString().split('T')[0];
+  }, []);
+
+  // Filtrar horarios disponibles según la fecha seleccionada
+  const horariosDisponibles = useMemo(() => {
+    if (!horarios || !formData.fecha) return horarios || [];
+
+    const now = new Date();
+    const selectedDate = new Date(formData.fecha + 'T00:00:00');
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // Si la fecha seleccionada no es hoy, mostrar todos los horarios
+    if (selectedDate.getTime() !== today.getTime()) {
+      return horarios;
+    }
+
+    // Si es hoy, filtrar horarios que ya pasaron
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    return horarios.filter(horario => {
+      // Parsear la hora del horario (formato "HH:MM:SS")
+      const [hours, minutes] = horario.hora.split(':').map(Number);
+      const horarioMinutes = hours * 60 + minutes;
+      
+      // Mantener solo horarios que aún no han pasado
+      return horarioMinutes > currentTime;
+    });
+  }, [horarios, formData.fecha]);
+
+  // Filtrar destinos según el origen seleccionado
+  const destinosDisponibles = useMemo(() => {
+    if (!puertos || !formData.origen) return [];
+
+    const origenSeleccionado = puertos.find(p => p.id === parseInt(formData.origen, 10));
+    
+    if (!origenSeleccionado) return [];
+
+    // Si el origen es Sierpe, el destino NO puede ser Sierpe
+    if (origenSeleccionado.nombre.toLowerCase().includes('sierpe')) {
+      return puertos.filter(p => !p.nombre.toLowerCase().includes('sierpe'));
+    }
+    
+    // Si el origen NO es Sierpe, el destino SOLO puede ser Sierpe
+    return puertos.filter(p => p.nombre.toLowerCase().includes('sierpe'));
+  }, [puertos, formData.origen]);
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+    const { name, value } = e.target;
+    
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      };
+
+      // Si cambia el origen, resetear el destino
+      if (name === 'origen') {
+        newData.destino = '';
+      }
+
+      // Si cambia la fecha, resetear el horario
+      if (name === 'fecha') {
+        newData.horario = '';
+      }
+
+      return newData;
     });
   };
 
@@ -40,51 +115,50 @@ function ReservationForm() {
       origen_id: formData.origen ? parseInt(formData.origen, 10) : null,
     };    
 
-    // 2. Validación simple
+    // Validación simple
     if (!rutaRequestData.fecha || !rutaRequestData.horario_id || !rutaRequestData.origen_id) {
         alert('Debe seleccionar fecha, horario y origen.');
         return;
     }   
-    // 4. SI TENEMOS ÉXITO, construir la RESERVA
-        const reservaData = {
-            new_item: true,
-            origen_id: formData.origen ? parseInt(formData.origen, 10) : null, // <-- ¡EL ID CORRECTO!
-            nombre: formData.nombreCompleto,
-            correo: formData.email,
-            destino_id: formData.destino ? parseInt(formData.destino, 10) : null,
-            hotel_id: formData.hotel ? parseInt(formData.hotel, 10) : null,
-            fecha: formData.fecha,
-            horario_id: formData.horario ? parseInt(formData.horario, 10) : null,
-        };
+    
+    // Construir la RESERVA
+    const reservaData = {
+        new_item: true,
+        origen_id: formData.origen ? parseInt(formData.origen, 10) : null,
+        nombre: formData.nombreCompleto,
+        correo: formData.email,
+        destino_id: formData.destino ? parseInt(formData.destino, 10) : null,
+        hotel_id: formData.hotel ? parseInt(formData.hotel, 10) : null,
+        fecha: formData.fecha,
+        horario_id: formData.horario ? parseInt(formData.horario, 10) : null,
+    };
 
-        // 5. Validación de la reserva
-        if (!reservaData.destino_id || !reservaData.nombre || !reservaData.correo) {
-            alert('Debe seleccionar un destino e ingresar su nombre y correo.');
-            return;
-        }
-        console.log('Datos de la reserva a enviar:', reservaData);      
+    // Validación de la reserva
+    if (!reservaData.destino_id || !reservaData.nombre || !reservaData.correo) {
+        alert('Debe seleccionar un destino e ingresar su nombre y correo.');
+        return;
+    }
+    console.log('Datos de la reserva a enviar:', reservaData);      
 
-        // Ejecutar la mutación
-        //alert('Enviando datos de reserva...' + JSON.stringify(reservaData));
-
-        saveReserva(reservaData, {
-          onSuccess: () => {
-            alert('Reservación creada exitosamente.');
-            setFormData({
-              origen: '',
-              destino: '',
-              fecha: '',
-              horario: '',
-              nombreCompleto: '',
-              email: '',
-              hotel: ''
-            });
-          },
-          onError: (err) => {
-            console.error('Error al crear la reserva:', err);
-            alert('Error al crear la reservación.');
-          }
-        });    
+    // Ejecutar la mutación
+    saveReserva(reservaData, {
+      onSuccess: () => {
+        alert('Reservación creada exitosamente.');
+        setFormData({
+          origen: '',
+          destino: '',
+          fecha: '',
+          horario: '',
+          nombreCompleto: '',
+          email: '',
+          hotel: ''
+        });
+      },
+      onError: (err) => {
+        console.error('Error al crear la reserva:', err);
+        alert('Error al crear la reservación.');
+      }
+    });    
   };
 
   return (
@@ -121,6 +195,7 @@ function ReservationForm() {
                       name="fecha"
                       value={formData.fecha}
                       onChange={handleChange}
+                      min={minDate}
                       className="shadow-sm"
                       required
                     />
@@ -138,14 +213,20 @@ function ReservationForm() {
                       value={formData.horario}
                       onChange={handleChange}
                       className="shadow-sm"
+                      disabled={!formData.fecha}
                       required
                     >
-                      <option value="">Selecciona el horario</option>
-                      {horarios?.map((horario) => (
+                      <option value="">
+                        {!formData.fecha ? 'Primero selecciona una fecha' : 'Selecciona el horario'}
+                      </option>
+                      {horariosDisponibles?.map((horario) => (
                         <option key={horario.id} value={horario.id}>
                           {horario.hora}
                         </option>
                       ))}
+                      {formData.fecha && horariosDisponibles?.length === 0 && (
+                        <option value="" disabled>No hay horarios disponibles para hoy</option>
+                      )}
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -187,10 +268,13 @@ function ReservationForm() {
                       value={formData.destino}
                       onChange={handleChange}
                       className="shadow-sm"
+                      disabled={!formData.origen}
                       required
                     >
-                      <option value="">Selecciona el destino</option>
-                      {puertos?.map((puerto) => (
+                      <option value="">
+                        {!formData.origen ? 'Primero selecciona un origen' : 'Selecciona el destino'}
+                      </option>
+                      {destinosDisponibles?.map((puerto) => (
                         <option key={puerto.id} value={puerto.id}>
                           {puerto.nombre}
                         </option>

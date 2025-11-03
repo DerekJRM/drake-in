@@ -1,12 +1,15 @@
 package com.example.be.security;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import com.example.be.model.Operador;
 import com.example.be.repository.OperadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.token.TokenService;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.be.model.Usuario;
 import com.example.be.repository.UsuarioRepository;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/auth")
@@ -41,6 +45,21 @@ public class AuthController {
     @PostMapping("/register/{nombre}")
     public String register(@RequestBody Usuario usuario, @PathVariable("nombre") String nombre) {
         usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
+        if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El correo electrónico ya está en uso. Por favor, utiliza otro correo."
+            );
+        }
+        List<Operador> operadores = operadorRepository.findAll();
+        for (Operador op : operadores) {
+            if (op.getCorreo().equalsIgnoreCase(usuario.getUsuario())) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "El correo electrónico ya está en uso. Por favor, utiliza otro correo."
+                );
+            }
+        }
         usuarioRepository.save(usuario);
         
         // Agregar rol al token
