@@ -108,6 +108,17 @@ public class Controller {
         }
     }
 
+    // === NUEVO ENDPOINT PARA AUTHCONTEXT ===
+
+    @GetMapping("findOperadorByUsuarioId")
+    public ResponseEntity<?> findOperadorByUsuarioId(@RequestParam Long id){
+        Operador operador = service.findOperadorByUsuarioId(id);
+        if (operador == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró un operador para el usuario ID: " + id);
+        }
+        return ResponseEntity.ok(operador);
+    }
+
     // ================================= RESERVAS =================================
 
     @GetMapping("findAllReservas")
@@ -164,6 +175,31 @@ public class Controller {
                     e.getMessage()
                     );
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorHtml);
+        }
+    }
+
+
+    @GetMapping("findReservasByFecha")
+    public ResponseEntity<?> findReservasByFecha(
+            // Esta anotación es clave para convertir el string "YYYY-MM-DD" a un objeto LocalDate
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fecha
+    ) {
+        try {
+            return ResponseEntity.ok(service.findReservasByFecha(fecha));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("findReservasByFechaAndHotel")
+    public ResponseEntity<?> findReservasByFechaAndHotel(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate fecha,
+            @RequestParam Long hotelId
+    ) {
+        try {
+            return ResponseEntity.ok(service.findReservasByFechaAndHotel(fecha, hotelId));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
