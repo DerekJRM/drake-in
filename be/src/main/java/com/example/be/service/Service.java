@@ -193,8 +193,19 @@ public class Service implements I_Service {
                 try{origenNombre = findPuertoById(savedReserva.getOrigenId()).getNombre();} catch (Exception e) {   }
                 try{destinoNombre = findPuertoById(savedReserva.getDestinoId()).getNombre();} catch (Exception e) {   }
 
-                // TODO Lógica para saber la tarifa
-                try{tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();} catch (Exception e) {   }
+                // Lógica para determinar la tarifa según el puerto
+                try {
+                    if (savedReserva.getDestinoId() == 101) {
+                        // Si el destino es 101, usar el precio del origen
+                        tarifa = findPuertoById(savedReserva.getOrigenId()).getTarifa().doubleValue();
+                    } else if (savedReserva.getOrigenId() == 101) {
+                        // Si el origen es 101, usar el precio del destino
+                        tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();
+                    } else {
+                        // En otros casos, usar el precio del destino (comportamiento por defecto)
+                        tarifa = findPuertoById(savedReserva.getDestinoId()).getTarifa().doubleValue();
+                    }
+                } catch (Exception e) {   }
 
                 try{fechaRuta = savedReserva.getFecha();} catch (Exception e) {   }
                 try{horaRuta = findHorarioById(savedReserva.getHorarioId()).getHora();} catch (Exception e) {   }
