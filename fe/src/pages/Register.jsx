@@ -13,6 +13,7 @@ const Register = () => {
   const { mutate: deleteOperador, isLoading: isDeleting } = useDeleteOperador();
   
   const [apiError, setApiError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingOperador, setEditingOperador] = useState(null);
   const [validated, setValidated] = useState(false);
@@ -150,6 +151,7 @@ const Register = () => {
 
     if (userTypeError || hotelNameError || boatNameError || emailError || passwordError) {
       setApiError("Por favor, corrige los errores en el formulario antes de continuar");
+      setTimeout(() => setApiError(""), 5000);
       return;
     }
 
@@ -165,11 +167,12 @@ const Register = () => {
 
     saveUsuario(usuario, {
       onSuccess: () => {
-        alert("¡Usuario registrado exitosamente!");
+        setSuccessMessage("¡Usuario registrado exitosamente!");
         setFormData({ userType: "", hotelName: "", boatName: "", email: "", password: "" });
         setValidated(false);
         setFieldErrors({ userType: "", hotelName: "", boatName: "", email: "", password: "" });
         setApiError("");
+        setTimeout(() => setSuccessMessage(""), 5000);
       },
       onError: (error) => {
         console.error("Error al registrar usuario:", error);
@@ -187,6 +190,7 @@ const Register = () => {
         }
         
         setApiError(errorMessage);
+        setTimeout(() => setApiError(""), 5000);
       },
     });
   };
@@ -202,7 +206,8 @@ const Register = () => {
 
     const nameError = validateEditName(editFormData.nombre);
     if (nameError) {
-      alert(nameError);
+      setApiError(nameError);
+      setTimeout(() => setApiError(""), 5000);
       return;
     }
 
@@ -215,13 +220,15 @@ const Register = () => {
 
     saveOperador(updatedOperador, {
       onSuccess: () => {
-        alert("Operador actualizado exitosamente");
+        setSuccessMessage("Operador actualizado exitosamente");
         setShowModal(false);
         setEditingOperador(null);
+        setTimeout(() => setSuccessMessage(""), 5000);
       },
       onError: (error) => {
         console.error("Error al actualizar operador:", error);
-        alert("Error al actualizar el operador. Por favor, intenta nuevamente.");
+        setApiError("Error al actualizar el operador. Por favor, intenta nuevamente.");
+        setTimeout(() => setApiError(""), 5000);
       },
     });
   };
@@ -229,10 +236,14 @@ const Register = () => {
   const handleDelete = (operador) => {
     if (window.confirm(`¿Seguro que deseas eliminar a ${operador.nombre}?`)) {
       deleteOperador(operador.id, {
-        onSuccess: () => alert("Operador eliminado exitosamente"),
+        onSuccess: () => {
+          setSuccessMessage("Operador eliminado exitosamente");
+          setTimeout(() => setSuccessMessage(""), 5000);
+        },
         onError: (error) => {
           console.error("Error al eliminar operador:", error);
-          alert("Error al eliminar el operador. Por favor, intenta nuevamente.");
+          setApiError("Error al eliminar el operador. Por favor, intenta nuevamente.");
+          setTimeout(() => setApiError(""), 5000);
         },
       });
     }
@@ -249,6 +260,31 @@ const Register = () => {
   return (
     <Row className="mb-3">
       <Col xs={12}>
+        {/* Mensajes de éxito y error globales */}
+        {successMessage && (
+          <Alert 
+            variant="success" 
+            dismissible 
+            onClose={() => setSuccessMessage("")}
+            className="d-flex align-items-center mb-3"
+          >
+            <i className="bi bi-check-circle-fill me-2"></i>
+            {successMessage}
+          </Alert>
+        )}
+        
+        {apiError && !successMessage && (
+          <Alert 
+            variant="danger" 
+            dismissible 
+            onClose={() => setApiError("")}
+            className="d-flex align-items-center mb-3"
+          >
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {apiError}
+          </Alert>
+        )}
+
         <Card className="shadow-sm">
           <Card.Body className="p-4">
             {/* Título */}
@@ -283,14 +319,6 @@ const Register = () => {
             <Card className="shadow-sm mb-4">
               <Card.Body className="p-4">
                 <Form onSubmit={handleSubmit} noValidate>
-                  {/* Error de API */}
-                  {apiError && (
-                    <Alert variant="danger" className="d-flex align-items-center">
-                      <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                      {apiError}
-                    </Alert>
-                  )}
-
                   {/* Tipo de usuario */}
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-medium">
